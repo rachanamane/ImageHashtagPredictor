@@ -1,6 +1,13 @@
-import createTFRecords as createTFRecords
 import os
 import tensorflow as tf
+
+import preprocess.readImages as readImages
+from shared.features import ImageHashtagFeatures
+
+# Unused import - Required for flags - Don't remove
+import shared.flags
+
+FLAGS = tf.app.flags.FLAGS
 
 def _int64_feature(value):
     if not isinstance(value, list):
@@ -12,12 +19,11 @@ def _bytes_feature(value):
 
 def _convert_to_example(file_path, image_buffer, hash_tags, height, width):
     return tf.train.Example(features=tf.train.Features(feature={
-        'height':_int64_feature(height),
-        'width':_int64_feature(width),
-        'labels':_int64_feature(hash_tags),
-        'image_raw':_bytes_feature(image_buffer)
+        ImageHashtagFeatures.heightFeature: _int64_feature(height),
+        ImageHashtagFeatures.widthFeature: _int64_feature(width),
+        ImageHashtagFeatures.labelsFeature: _int64_feature(hash_tags),
+        ImageHashtagFeatures.imageRawFeature: _bytes_feature(image_buffer)
     }))
-
 
 def _process_single_image(file_path):
     # TODO: Try changing rb to r
@@ -52,9 +58,11 @@ def _process_single_image(file_path):
         sess.close()
         return img, height, width
 
+def create_tf_record_filename():
+    return 'image-features.tfrecord'
+
 def _process_dataset(image_and_hashtags):
-    # TODO: Create flag for this path
-    output_file = os.path.join('/Users/namitr/tfprograms/dataset_tfrecords', 'TFRecord')
+    output_file = os.path.join(FLAGS.tfrecords_dir, create_tf_record_filename())
     writer = tf.python_io.TFRecordWriter(output_file)
 
     index = 0
@@ -68,8 +76,9 @@ def _process_dataset(image_and_hashtags):
 
 
 def main():
-    # TODO: Create flag for root directory
-    image_and_hastags = createTFRecords.read_all_directories('/Users/namitr/tfprograms/dataset')
+    image_and_hastags = readImages.read_all_directories(FLAGS.dataset_dir)
+    # TODO: Remove this and implement batching
+    image_and_hastags = [image_and_hastags[i] for i in range(1, 100)]
     _process_dataset(image_and_hastags)
 
 if __name__ == "__main__":
