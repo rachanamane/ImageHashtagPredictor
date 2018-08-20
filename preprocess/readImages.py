@@ -29,7 +29,6 @@ def read_image_and_tags(dir_path, image_and_tags):
                 # TODO: Fix this
                 # hashtags = read_hash_tags(hash_tag_filepath)
                 hashtags = [(index + i) % 17 for i in range(5)]
-                print hashtags
                 image_and_tags.append((file_path, hashtags))
         index += 1
 

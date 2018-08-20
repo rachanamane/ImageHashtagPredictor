@@ -17,3 +17,5 @@ flags.DEFINE_integer('training_set_size', 100, 'Training set size.')
 
 flags.DEFINE_integer('image_width', 224, 'Image width after cropping')
 flags.DEFINE_integer('image_height', 224, 'Image height after cropping')
+
+flags.DEFINE_integer('batch_size', 10, 'Images to process in 1 batch')

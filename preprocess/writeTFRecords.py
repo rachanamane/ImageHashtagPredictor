@@ -24,8 +24,8 @@ def _convert_to_example(file_path, image_buffer, hash_tags, height, width):
     return tf.train.Example(features=tf.train.Features(feature={
         ImageHashtagFeatures.heightFeature: _int64_feature(height),
         ImageHashtagFeatures.widthFeature: _int64_feature(width),
+        ImageHashtagFeatures.imageRawFeature: _bytes_feature(image_buffer),
         ImageHashtagFeatures.labelsFeature: _int64_feature(hash_tags),
-        ImageHashtagFeatures.imageRawFeature: _bytes_feature(image_buffer)
     }))
 
 def _process_single_image(file_path):
@@ -81,7 +81,7 @@ def _process_dataset(image_and_hashtags):
 def main():
     image_and_hastags = readImages.read_all_directories(FLAGS.dataset_dir)
     # TODO: Remove this and implement batching
-    image_and_hastags = [image_and_hastags[i] for i in range(1, FLAGS.training_set_size)]
+    image_and_hastags = [image_and_hastags[i] for i in range(0, FLAGS.training_set_size)]
     _process_dataset(image_and_hastags)
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 class ImageHashtagFeatures:
     heightFeature = "height"
     widthFeature = "width"
-    labelsFeature = "labels"
-    imageRawFeature = "imageraw"
+    labelsFeature = "label"
+    imageRawFeature = "image_raw"

@@ -18,8 +18,8 @@ def run_model():
     print(image_raw.shape)
     print(labels.shape)
 
-    image_placeholder = tf.placeholder(tf.float32, shape=[10, FLAGS.image_width, FLAGS.image_height, 3])
-    labels_placeholder = tf.placeholder(tf.uint16, shape=[10, 5])
+    image_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, FLAGS.image_width, FLAGS.image_height, 3])
+    labels_placeholder = tf.placeholder(tf.uint16, shape=[FLAGS.batch_size, 5])
 
     #logits = createmodel.logits(image_placeholder)
     logits = flower.flower_inference(image_placeholder)
@@ -38,7 +38,8 @@ def run_model():
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord, sess = sess)
 
-        for i in range(FLAGS.training_set_size * 100):
+        # TODO: Update 1 to something appropriate
+        for i in range(FLAGS.training_set_size * 1):
             image_out, label_out = sess.run([image_raw, labels])
 
             print(image_out.shape)

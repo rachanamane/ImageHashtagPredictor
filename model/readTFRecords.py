@@ -1,6 +1,7 @@
 from shared.features import ImageHashtagFeatures
 from shared.singleimageobject import SingleImageObject
 
+import os
 import tensorflow as tf
 
 from os import listdir
@@ -19,14 +20,14 @@ def read_image_from_tfrecord(filename_queue):
         ImageHashtagFeatures.heightFeature: tf.FixedLenFeature([], tf.int64),
         ImageHashtagFeatures.widthFeature: tf.FixedLenFeature([], tf.int64),
         ImageHashtagFeatures.imageRawFeature: tf.FixedLenFeature([], tf.string),
-        ImageHashtagFeatures.labelsFeature: tf.FixedLenFeature([], tf.int64),
+        ImageHashtagFeatures.labelsFeature: tf.FixedLenFeature([5], tf.int64),
     })
     return SingleImageObject(features_dict)
 
 
 def get_tfrecord_filenames():
     files = listdir(FLAGS.tfrecords_dir)
-    return [x for x in files if x.endswith(".tfrecord")]
+    return [os.path.join(FLAGS.tfrecords_dir, x) for x in files if x.endswith(".tfrecord")]
 
 
 def read_tf_records():
@@ -35,7 +36,7 @@ def read_tf_records():
     # TODO: Add batch size flag
     batch_image, batch_labels = tf.train.batch(
             [image_object.image_raw, image_object.labels],
-            batch_size=10,
+            batch_size=FLAGS.batch_size,
             num_threads=1)
 
     return batch_image, batch_labels
