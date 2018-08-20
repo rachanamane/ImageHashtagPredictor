@@ -12,6 +12,8 @@ flags.DEFINE_string('tfrecords_dir', '/Users/namitr/tfprograms/generated/tfrecor
 flags.DEFINE_string('checkpoint_file', '/Users/namitr/tfprograms/generated/checkpoint/train.ckpt',
 					'Checkpoint file to save training progress.')
 
+flags.DEFINE_string('hashtags_output_file', '/Users/namitr/tfprograms/generated/hashtag_map.txt',
+					'Hashtags used for training.')
 
 flags.DEFINE_integer('training_set_size', 100, 'Training set size.')
 
@@ -19,3 +21,5 @@ flags.DEFINE_integer('image_width', 224, 'Image width after cropping')
 flags.DEFINE_integer('image_height', 224, 'Image height after cropping')
 
 flags.DEFINE_integer('batch_size', 10, 'Images to process in 1 batch')
+
+flags.DEFINE_integer('label_set_size', 500, 'Number of labels in training/evaluation set')
