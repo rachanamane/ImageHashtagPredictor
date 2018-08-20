@@ -1,15 +1,12 @@
 from shared.features import ImageHashtagFeatures
 from shared.singleimageobject import SingleImageObject
 
-import os
-import numpy as np
 import tensorflow as tf
 
 from os import listdir
 
 # Unused import - Required for flags - Don't remove
 import shared.flags
-
 FLAGS = tf.app.flags.FLAGS
 
 
@@ -41,4 +38,4 @@ def read_tf_records():
             batch_size=10,
             num_threads=1)
 
-    return batch_image, batch_labels,
+    return batch_image, batch_labels
