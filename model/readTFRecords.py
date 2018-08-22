@@ -20,7 +20,7 @@ def read_image_from_tfrecord(filename_queue):
         ImageHashtagFeatures.heightFeature: tf.FixedLenFeature([], tf.int64),
         ImageHashtagFeatures.widthFeature: tf.FixedLenFeature([], tf.int64),
         ImageHashtagFeatures.imageRawFeature: tf.FixedLenFeature([], tf.string),
-        ImageHashtagFeatures.labelsFeature: tf.FixedLenFeature([5], tf.int64),
+        ImageHashtagFeatures.labelsFeature: tf.FixedLenFeature([FLAGS.label_set_size], tf.int64),
     })
     return SingleImageObject(features_dict)
 

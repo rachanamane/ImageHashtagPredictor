@@ -15,14 +15,12 @@ FLAGS = tf.app.flags.FLAGS
 
 def run_model():
     image_raw, labels = readTFRecords.read_tf_records()
-    print(image_raw.shape)
-    print(labels.shape)
 
     image_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, FLAGS.image_width, FLAGS.image_height, 3])
-    labels_placeholder = tf.placeholder(tf.uint16, shape=[FLAGS.batch_size, 5])
+    labels_placeholder = tf.placeholder(tf.uint16, shape=[FLAGS.batch_size, FLAGS.label_set_size])
 
-    #logits = createmodel.logits(image_placeholder)
-    logits = flower.flower_inference(image_placeholder)
+    logits = createmodel.logits(image_placeholder)
+    #logits = flower.flower_inference(image_placeholder)
     loss = tf.losses.mean_squared_error(labels=labels_placeholder, predictions=logits)
 
     train_step = tf.train.GradientDescentOptimizer(0.0005).minimize(loss)

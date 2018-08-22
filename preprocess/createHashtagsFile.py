@@ -34,7 +34,7 @@ def _process_directory(dir, hashtags):
 def _write_hashtag_label_set_file(hashtags):
     hashtag_id_lookup = {}
     with open(FLAGS.hashtags_output_file, 'w') as f:
-        index = 1
+        index = 0
         for key in hashtags:
             f.write('%6s %s\n' % (index, key))
             hashtag_id_lookup[key] = index
