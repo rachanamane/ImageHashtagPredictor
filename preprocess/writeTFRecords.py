@@ -1,3 +1,4 @@
+import numpy as np
 import os
 import tensorflow as tf
 
@@ -20,13 +21,22 @@ def _bytes_feature(value):
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
 
-def _convert_to_example(file_path, image_buffer, hash_tags, height, width):
+def _create_encoded_hashtags(hashtags):
+    ret = np.zeros([FLAGS.label_set_size], dtype=int)
+    for hashtag in hashtags:
+        ret[hashtag] = 1
+    return ret.tolist()
+
+
+def _convert_to_example(file_path, image_buffer, hashtags, height, width):
     return tf.train.Example(features=tf.train.Features(feature={
         ImageHashtagFeatures.heightFeature: _int64_feature(height),
         ImageHashtagFeatures.widthFeature: _int64_feature(width),
         ImageHashtagFeatures.imageRawFeature: _bytes_feature(image_buffer),
-        ImageHashtagFeatures.labelsFeature: _int64_feature(hash_tags),
+        ImageHashtagFeatures.labelsFeature: _int64_feature(hashtags),
+        ImageHashtagFeatures.encodedLabelsFeature: _int64_feature(_create_encoded_hashtags(hashtags)),
     }))
+
 
 def _process_single_image(file_path):
     # TODO: Try changing rb to r
@@ -59,19 +69,21 @@ def _process_single_image(file_path):
         sess.close()
         return img, height, width
 
-def create_tf_record_filename():
+
+def _create_tf_record_filename():
     return 'image-features.tfrecord'
 
+
 def _process_dataset(image_and_hashtags):
-    output_file = os.path.join(FLAGS.tfrecords_dir, create_tf_record_filename())
+    output_file = os.path.join(FLAGS.tfrecords_dir, _create_tf_record_filename())
     writer = tf.python_io.TFRecordWriter(output_file)
 
     index = 0
-    for file_path, hash_tags in image_and_hashtags:
-        if len(hash_tags) == 0:
+    for file_path, hashtags in image_and_hashtags:
+        if len(hashtags) == 0:
             continue
         image_buffer, height, width = _process_single_image(file_path)
-        example = _convert_to_example(file_path, image_buffer, hash_tags, height, width)
+        example = _convert_to_example(file_path, image_buffer, hashtags, height, width)
         writer.write(example.SerializeToString())
         index += 1
         if not index % 20:
@@ -83,6 +95,7 @@ def main():
     # TODO: Remove this and implement batching
     image_and_hastags = [image_and_hastags[i] for i in range(0, FLAGS.training_set_size)]
     _process_dataset(image_and_hastags)
+
 
 if __name__ == "__main__":
     main()

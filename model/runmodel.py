@@ -14,14 +14,14 @@ FLAGS = tf.app.flags.FLAGS
 
 
 def run_model():
-    image_raw, labels = readTFRecords.read_tf_records()
+    image_raw, _, encoded_labels = readTFRecords.read_tf_records()
 
     image_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, FLAGS.image_width, FLAGS.image_height, 3])
-    labels_placeholder = tf.placeholder(tf.uint16, shape=[FLAGS.batch_size, FLAGS.label_set_size])
+    encoded_labels_placeholder = tf.placeholder(tf.uint16, shape=[FLAGS.batch_size, FLAGS.label_set_size])
 
     logits = createmodel.logits(image_placeholder)
     #logits = flower.flower_inference(image_placeholder)
-    loss = tf.losses.mean_squared_error(labels=labels_placeholder, predictions=logits)
+    loss = tf.losses.mean_squared_error(labels=encoded_labels_placeholder, predictions=logits)
 
     train_step = tf.train.GradientDescentOptimizer(0.0005).minimize(loss)
 
@@ -38,14 +38,14 @@ def run_model():
 
         # TODO: Update 1 to something appropriate
         for i in range(FLAGS.training_set_size * 1):
-            image_out, label_out = sess.run([image_raw, labels])
+            image_out, encoded_labels_out = sess.run([image_raw, encoded_labels])
 
             print(image_out.shape)
             _, infer_out, loss_out = sess.run(
                     [train_step, logits, loss],
                     feed_dict={
                         image_placeholder: image_out,
-                        labels_placeholder: label_out})
+                        encoded_labels_placeholder: encoded_labels_out})
 
             print(i)
             print("infer_out: ")

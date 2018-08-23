@@ -1,7 +1,7 @@
 from os import listdir
 from os.path import isfile, join, isdir
 
-import numpy as np
+
 import preprocess.createHashtagsFile as createHashtagsFile
 import tensorflow as tf
 
@@ -30,13 +30,6 @@ def get_fixed_size_list(hashtags):
         return hashtags
 
 
-def create_encoded_hashtags(hashtags):
-    ret = np.zeros([FLAGS.label_set_size], dtype=int)
-    for hashtag in hashtags:
-        ret[hashtag] = 1
-    return ret.tolist()
-
-
 def read_image_and_tags(dir_path, image_and_tags):
     hashtag_id_lookup = createHashtagsFile.get_hashtag_label_set()
     files = listdir(dir_path)
@@ -47,7 +40,6 @@ def read_image_and_tags(dir_path, image_and_tags):
             if isfile(hash_tag_filepath):
                 hashtags = read_hash_tags(hash_tag_filepath, hashtag_id_lookup)
                 if hashtags:
-                    hashtags = create_encoded_hashtags(hashtags)
                     image_and_tags.append((file_path, hashtags))
 
 

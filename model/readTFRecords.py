@@ -20,7 +20,8 @@ def read_image_from_tfrecord(filename_queue):
         ImageHashtagFeatures.heightFeature: tf.FixedLenFeature([], tf.int64),
         ImageHashtagFeatures.widthFeature: tf.FixedLenFeature([], tf.int64),
         ImageHashtagFeatures.imageRawFeature: tf.FixedLenFeature([], tf.string),
-        ImageHashtagFeatures.labelsFeature: tf.FixedLenFeature([FLAGS.label_set_size], tf.int64),
+        ImageHashtagFeatures.labelsFeature: tf.VarLenFeature(tf.int64),
+        ImageHashtagFeatures.encodedLabelsFeature: tf.VarLenFeature([FLAGS.label_set_size], tf.int64),
     })
     return SingleImageObject(features_dict)
 
@@ -34,8 +35,8 @@ def read_tf_records():
     filename_queue = tf.train.string_input_producer(get_tfrecord_filenames())
     image_object = read_image_from_tfrecord(filename_queue)
     # TODO: Add batch size flag
-    batch_image, batch_labels = tf.train.batch(
-            [image_object.image_raw, image_object.labels],
+    batch_image, batch_labels, batch_encoded_labels = tf.train.batch(
+            [image_object.image_raw, image_object.labels, image_object.encoded_labels],
             batch_size=FLAGS.batch_size,
             num_threads=1)
 

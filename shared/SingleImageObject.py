@@ -15,3 +15,4 @@ class SingleImageObject:
         image_decoded.set_shape([FLAGS.image_width, FLAGS.image_height, 3])
         self.image_raw = image_decoded
         self.labels = features_dict[ImageHashtagFeatures.labelsFeature]
+        self.encoded_labels = features_dict[ImageHashtagFeatures.encodedLabelsFeature]
