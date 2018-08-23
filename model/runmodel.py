@@ -6,7 +6,6 @@ import tensorflow as tf
 
 import model.readTFRecords as readTFRecords
 import model.createmodel as createmodel
-import model.flower as flower
 
 # Unused import - Required for flags - Don't remove
 import shared.flags
@@ -20,7 +19,6 @@ def run_model():
     encoded_labels_placeholder = tf.placeholder(tf.uint16, shape=[FLAGS.batch_size, FLAGS.label_set_size])
 
     logits = createmodel.logits(image_placeholder)
-    #logits = flower.flower_inference(image_placeholder)
     loss = tf.losses.mean_squared_error(labels=encoded_labels_placeholder, predictions=logits)
 
     train_step = tf.train.GradientDescentOptimizer(0.0005).minimize(loss)
