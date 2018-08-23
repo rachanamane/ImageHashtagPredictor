@@ -3,7 +3,7 @@ import tensorflow as tf
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('dataset_dir', '/Users/namitr/tfprograms/dataset',
+flags.DEFINE_string('dataset_dir', '/Users/namitr/tfprograms/dataset/dogsofinstagram',
 					'Directory containing images and tags.')
 
 flags.DEFINE_string('tfrecords_dir', '/Users/namitr/tfprograms/generated/tfrecords',
@@ -15,8 +15,8 @@ flags.DEFINE_string('checkpoint_file', '/Users/namitr/tfprograms/generated/check
 flags.DEFINE_string('hashtags_output_file', '/Users/namitr/tfprograms/generated/hashtag_map.txt',
 					'Hashtags used for training.')
 
-flags.DEFINE_integer('training_set_size', 100, 'Training set size.')
-flags.DEFINE_integer('eval_set_size', 20, 'Evaluation set size.')
+flags.DEFINE_integer('training_set_size', 1000, 'Training set size.')
+flags.DEFINE_integer('eval_set_size', 100, 'Evaluation set size.')
 
 flags.DEFINE_integer('image_width', 299, 'Image width after cropping')
 flags.DEFINE_integer('image_height', 299, 'Image height after cropping')

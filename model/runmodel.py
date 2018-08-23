@@ -38,7 +38,6 @@ def run_model():
         for i in range(FLAGS.training_set_size * 1):
             image_out, encoded_labels_out = sess.run([image_raw, encoded_labels])
 
-            print(image_out.shape)
             _, infer_out, loss_out = sess.run(
                     [train_step, logits, loss],
                     feed_dict={
