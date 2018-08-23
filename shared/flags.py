@@ -16,6 +16,7 @@ flags.DEFINE_string('hashtags_output_file', '/Users/namitr/tfprograms/generated/
 					'Hashtags used for training.')
 
 flags.DEFINE_integer('training_set_size', 100, 'Training set size.')
+flags.DEFINE_integer('eval_set_size', 20, 'Evaluation set size.')
 
 flags.DEFINE_integer('image_width', 299, 'Image width after cropping')
 flags.DEFINE_integer('image_height', 299, 'Image height after cropping')

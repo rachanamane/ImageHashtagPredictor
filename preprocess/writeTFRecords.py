@@ -70,12 +70,12 @@ def _process_single_image(file_path):
         return img, height, width
 
 
-def _create_tf_record_filename():
-    return 'image-features.tfrecord'
+def _create_tf_record_filename(mode):
+    return '%s-image-features.tfrecord' % mode
 
 
-def _process_dataset(image_and_hashtags):
-    output_file = os.path.join(FLAGS.tfrecords_dir, _create_tf_record_filename())
+def _process_dataset(mode, image_and_hashtags):
+    output_file = os.path.join(FLAGS.tfrecords_dir, _create_tf_record_filename(mode))
     writer = tf.python_io.TFRecordWriter(output_file)
 
     index = 0
@@ -91,10 +91,16 @@ def _process_dataset(image_and_hashtags):
 
 
 def main():
-    image_and_hastags = readImages.read_all_directories(FLAGS.dataset_dir)
+    image_and_hashtags = readImages.read_all_directories(FLAGS.dataset_dir)
     # TODO: Remove this and implement batching
-    image_and_hastags = [image_and_hastags[i] for i in range(0, FLAGS.training_set_size)]
-    _process_dataset(image_and_hastags)
+    if FLAGS.training_set_size + FLAGS.eval_set_size > len(image_and_hashtags):
+        raise Exception("Please reduce training or evaluation size. Total images available are %s" % (len(image_and_hashtags)))
+    train_image_and_hashtags = [image_and_hashtags[i] for i in range(0, FLAGS.training_set_size)]
+    eval_image_and_hashtags = [image_and_hashtags[i] for i in range(FLAGS.training_set_size, FLAGS.training_set_size + FLAGS.eval_set_size)]
+    print(len(train_image_and_hashtags))
+    print(len(eval_image_and_hashtags))
+    _process_dataset('train', train_image_and_hashtags)
+    _process_dataset('eval', eval_image_and_hashtags)
 
 
 if __name__ == "__main__":
