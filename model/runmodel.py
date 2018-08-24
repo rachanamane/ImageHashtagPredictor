@@ -9,6 +9,7 @@ import model.createmodel as createmodel
 
 # Unused import - Required for flags - Don't remove
 import shared.flags
+
 FLAGS = tf.app.flags.FLAGS
 
 
@@ -30,37 +31,39 @@ def run_model():
         file_writer = tf.summary.FileWriter("./logs", sess.graph)
         sess.run(tf.global_variables_initializer())
 
-        #saver.restore(sess, FLAGS.checkpoint_file)
+        # saver.restore(sess, FLAGS.checkpoint_file)
         coord = tf.train.Coordinator()
-        threads = tf.train.start_queue_runners(coord=coord, sess = sess)
+        threads = tf.train.start_queue_runners(coord=coord, sess=sess)
 
         # TODO: Update 1 to something appropriate
         for i in range(FLAGS.training_set_size * 1):
             image_out, encoded_labels_out = sess.run([image_raw, encoded_labels])
 
             _, infer_out, loss_out = sess.run(
-                    [train_step, logits, loss],
-                    feed_dict={
-                        image_placeholder: image_out,
-                        encoded_labels_placeholder: encoded_labels_out})
+                [train_step, logits, loss],
+                feed_dict={
+                    image_placeholder: image_out,
+                    encoded_labels_placeholder: encoded_labels_out})
 
             print(i)
             print("infer_out: ")
             print(infer_out)
             print("loss: ")
             print(loss_out)
-            if(i%20 == 0):
+            if i % 20 == 0:
                 saver.save(sess, FLAGS.checkpoint_file)
 
         coord.request_stop()
         coord.join(threads)
         sess.close()
 
+
 def main():
     tf.reset_default_graph()
     with tf.Graph().as_default():
         tf.logging.set_verbosity(tf.logging.INFO)
         run_model()
+
 
 if __name__ == "__main__":
     main()
