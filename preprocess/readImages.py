@@ -1,7 +1,6 @@
 from os import listdir
 from os.path import isfile, join, isdir
 
-
 import preprocess.createHashtagsFile as createHashtagsFile
 import tensorflow as tf
 

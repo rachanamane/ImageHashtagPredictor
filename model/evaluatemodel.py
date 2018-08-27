@@ -1,6 +1,5 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.contrib import slim
 
 from model import readTFRecords, createmodel
 
