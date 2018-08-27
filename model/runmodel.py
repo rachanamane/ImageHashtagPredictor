@@ -62,6 +62,8 @@ def run_model():
 
 
 def main():
+    # TODO: Consider using Estimator:
+    # https://www.tensorflow.org/api_docs/python/tf/estimator/Estimator#predict
     tf.reset_default_graph()
     with tf.Graph().as_default():
         tf.logging.set_verbosity(tf.logging.INFO)

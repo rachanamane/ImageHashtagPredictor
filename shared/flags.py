@@ -3,7 +3,7 @@ import tensorflow as tf
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('dataset_dir', '/home/vaibhav/tfprograms/dataset/dogsofinstagram',
+flags.DEFINE_string('dataset_dir', '/home/vaibhav/tfprograms/dataset',
 					'Directory containing images and tags.')
 
 flags.DEFINE_string('tfrecords_dir', '/home/vaibhav/tfprograms/generated/tfrecords',
@@ -21,12 +21,12 @@ flags.DEFINE_string('checkpoint_file', 'train.ckpt',
 flags.DEFINE_string('hashtags_output_file', '/home/vaibhav/tfprograms/generated/hashtag_map.txt',
 					'Hashtags used for training.')
 
-flags.DEFINE_integer('training_set_size', 1000, 'Training set size.')
-flags.DEFINE_integer('eval_set_size', 100, 'Evaluation set size.')
+flags.DEFINE_integer('training_set_size', 15000, 'Training set size.')
+flags.DEFINE_integer('eval_set_size', 2000, 'Evaluation set size.')
 
 flags.DEFINE_integer('image_width', 299, 'Image width after cropping')
 flags.DEFINE_integer('image_height', 299, 'Image height after cropping')
 
-flags.DEFINE_integer('batch_size', 10, 'Images to process in 1 batch')
+flags.DEFINE_integer('batch_size', 25, 'Images to process in 1 batch')
 
-flags.DEFINE_integer('label_set_size', 100, 'Number of labels in training/evaluation set')
+flags.DEFINE_integer('label_set_size', 150, 'Number of labels in training/evaluation set')

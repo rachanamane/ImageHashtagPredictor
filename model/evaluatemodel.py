@@ -27,13 +27,16 @@ def evaluate_model():
     true_positives=np.zeros(10)
     false_positives=np.zeros(10)
 
+    # TODO: Maybe calculate accuracy too:
+    # https://stackoverflow.com/questions/50285883/tensorflow-cross-entropy-for-multi-labels-classification
+
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         saver.restore(sess, tf.train.latest_checkpoint(FLAGS.train_checkpoint_dir))
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord, sess=sess)
 
-        for i in range(FLAGS.eval_set_size // FLAGS.batch_size):
+        for eval_step in range(FLAGS.eval_set_size // FLAGS.batch_size):
             image_out, encoded_labels_out = sess.run([image_raw, encoded_labels])
 
             logits_out, predictions_out = sess.run([logits, predictions],
@@ -55,6 +58,9 @@ def evaluate_model():
                             false_positives[k] += 1
                         #print("True: %s, False: %s" % (true_positives, false_positives))
                         #print("----------------")
+
+            if eval_step % 20 == 19:
+                print ("Precision for top 1 labels: %s%%" % (true_positives[0] * 100.0 / (true_positives[0] + false_positives[0])))
 
         for k in range(10):
             print ("Precision for top %s labels: %s%%" % (k+1, true_positives[k] * 100.0 / (true_positives[k] + false_positives[k])))

@@ -36,6 +36,6 @@ def read_tf_records(mode):
     batch_image, batch_labels, batch_encoded_labels = tf.train.batch(
             [image_object.image_raw, image_object.labels, image_object.encoded_labels],
             batch_size=FLAGS.batch_size,
-            num_threads=1)
+            num_threads=5)
 
     return batch_image, batch_labels, batch_encoded_labels
