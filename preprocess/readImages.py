@@ -22,14 +22,6 @@ def _read_hash_tags(hash_tag_filepath, hashtag_id_lookup):
     return sorted(hash_tags)
 
 
-def _get_fixed_size_list(hashtags):
-    if len(hashtags) >= FLAGS.labels_per_image:
-        return hashtags[:FLAGS.labels_per_image]
-    if len(hashtags) < FLAGS.labels_per_image:
-        hashtags.extend([0] * (FLAGS.labels_per_image - len(hashtags)))
-        return hashtags
-
-
 def _read_image_and_tags(file_path, image_and_tags, hashtag_id_lookup):
     if file_path.endswith(".jpg"):
         hash_tag_filepath = file_path[0:-4] + ".txt"
