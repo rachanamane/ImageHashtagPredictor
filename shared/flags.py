@@ -30,8 +30,5 @@ flags.DEFINE_integer('image_height', 299, 'Image height after cropping')
 
 flags.DEFINE_integer('batch_size', 10, 'Images to process in 1 batch')
 
-# TODO: Remove this and allow variable labels per image
-flags.DEFINE_integer('labels_per_image', 10, 'Fixed number of labels per image')
-
 # Deliberately the same as image_width
 flags.DEFINE_integer('label_set_size', 299, 'Number of labels in training/evaluation set')
