@@ -86,7 +86,7 @@ def _process_dataset(mode, image_and_hashtags):
         writer.write(example.SerializeToString())
         index += 1
         if not index % 20:
-            print("Processed %s images" % (index))
+            print("Processed %s %s images" % (index, mode))
 
 
 def main():

@@ -1,5 +1,5 @@
 from shared.features import ImageHashtagFeatures
-from shared.singleimageobject import SingleImageObject
+from shared.SingleImageObject import SingleImageObject
 
 import os
 import tensorflow as tf

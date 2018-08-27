@@ -1,8 +1,9 @@
 from shared.features import ImageHashtagFeatures
-from shared.singleimageobject import SingleImageObject
+from shared.SingleImageObject import SingleImageObject
 
 import numpy as np
 import tensorflow as tf
+import time
 
 import model.readTFRecords as readTFRecords
 import model.createmodel as createmodel
@@ -27,6 +28,7 @@ def run_model():
 
     saver = tf.train.Saver()
 
+    start_time = time.time()
     with tf.Session() as sess:
         # Visualize the graph through tensorboard.
         #file_writer = tf.summary.FileWriter("./logs", sess.graph)
@@ -36,23 +38,25 @@ def run_model():
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord, sess=sess)
 
+        steps = (FLAGS.training_set_size * 2) // FLAGS.batch_size
+        print("Running %s steps" % steps)
         # TODO: Update 1 to something appropriate
-        for i in range((FLAGS.training_set_size * 1) // FLAGS.batch_size):
+        for i in range(steps):
             image_out, encoded_labels_out = sess.run([image_raw, encoded_labels])
 
-            _, infer_out, loss_out = sess.run(
+            _, _, loss_out = sess.run(
                 [train_step, logits, loss],
                 feed_dict={
                     image_placeholder: image_out,
                     encoded_labels_placeholder: encoded_labels_out})
 
-            print(i)
-            print("infer_out: ")
-            print(infer_out)
+            print("Completed %s of %s steps" % (i, steps))
             print("loss: ")
             print(loss_out)
             if i % 20 == 0:
                 saver.save(sess, join(FLAGS.train_checkpoint_dir, FLAGS.checkpoint_file))
+                duration = time.time() - start_time
+                print("Completed %s seconds" % duration)
 
         coord.request_stop()
         coord.join(threads)
