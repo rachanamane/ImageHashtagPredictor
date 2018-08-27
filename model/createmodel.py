@@ -44,7 +44,7 @@ def logits(image):
     conv2 = tf.layers.conv2d(
           inputs=pool1,
           filters=current_filters,
-          kernel_size=[5, 5],
+          kernel_size=[6, 6],
           activation=tf.nn.relu)
     current_tensor_width = current_tensor_width - 5 + 1
     current_tensor_height = current_tensor_height - 5 + 1
