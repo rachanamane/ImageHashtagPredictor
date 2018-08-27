@@ -1,5 +1,5 @@
 from shared.features import ImageHashtagFeatures
-from shared.singleimageobject import SingleImageObject
+from shared.SingleImageObject import SingleImageObject
 
 import numpy as np
 import tensorflow as tf
@@ -14,13 +14,14 @@ FLAGS = tf.app.flags.FLAGS
 
 
 def run_model():
-    image_raw, _, encoded_labels = readTFRecords.read_tf_records()
+    image_raw, _, encoded_labels = readTFRecords.read_tf_records("train")
 
     image_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, FLAGS.image_width, FLAGS.image_height, 3])
     encoded_labels_placeholder = tf.placeholder(tf.uint16, shape=[FLAGS.batch_size, FLAGS.label_set_size])
 
     logits = createmodel.logits(image_placeholder)
-    loss = tf.losses.mean_squared_error(labels=encoded_labels_placeholder, predictions=logits)
+    loss = createmodel.loss(logits, encoded_labels_placeholder)
+    #loss = tf.losses.mean_squared_error(labels=encoded_labels_placeholder, predictions=logits)
 
     train_step = tf.train.GradientDescentOptimizer(0.0005).minimize(loss)
 
@@ -28,7 +29,7 @@ def run_model():
 
     with tf.Session() as sess:
         # Visualize the graph through tensorboard.
-        file_writer = tf.summary.FileWriter("./logs", sess.graph)
+        #file_writer = tf.summary.FileWriter("./logs", sess.graph)
         sess.run(tf.global_variables_initializer())
 
         # saver.restore(sess, FLAGS.checkpoint_file)

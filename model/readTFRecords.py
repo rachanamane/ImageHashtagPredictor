@@ -1,5 +1,5 @@
 from shared.features import ImageHashtagFeatures
-from shared.singleimageobject import SingleImageObject
+from shared.SingleImageObject import SingleImageObject
 
 import os
 import tensorflow as tf
@@ -21,18 +21,17 @@ def read_image_from_tfrecord(filename_queue):
         ImageHashtagFeatures.widthFeature: tf.FixedLenFeature([], tf.int64),
         ImageHashtagFeatures.imageRawFeature: tf.FixedLenFeature([], tf.string),
         ImageHashtagFeatures.labelsFeature: tf.VarLenFeature(tf.int64),
-        ImageHashtagFeatures.encodedLabelsFeature: tf.VarLenFeature([FLAGS.label_set_size], tf.int64),
+        ImageHashtagFeatures.encodedLabelsFeature: tf.FixedLenFeature([FLAGS.label_set_size], tf.int64),
     })
     return SingleImageObject(features_dict)
 
-
-def get_tfrecord_filenames():
+def get_tfrecord_filenames(mode):
     files = listdir(FLAGS.tfrecords_dir)
-    return [os.path.join(FLAGS.tfrecords_dir, x) for x in files if x.endswith(".tfrecord")]
+    return [os.path.join(FLAGS.tfrecords_dir, x) for x in files if x.endswith(".tfrecord") and x.startswith(mode)]
 
 
-def read_tf_records():
-    filename_queue = tf.train.string_input_producer(get_tfrecord_filenames())
+def read_tf_records(mode):
+    filename_queue = tf.train.string_input_producer(get_tfrecord_filenames(mode))
     image_object = read_image_from_tfrecord(filename_queue)
     # TODO: Add batch size flag
     batch_image, batch_labels, batch_encoded_labels = tf.train.batch(
@@ -40,4 +39,4 @@ def read_tf_records():
             batch_size=FLAGS.batch_size,
             num_threads=1)
 
-    return batch_image, batch_labels
+    return batch_image, batch_labels, batch_encoded_labels

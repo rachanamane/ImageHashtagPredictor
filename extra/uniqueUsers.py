@@ -37,7 +37,7 @@ if __name__ == "__main__":
     parser.add_argument(
       '--dataset_dir',
       type=str,
-      default='/Users/namitr/tfprograms/dataset',
+      default='/home/vaibhav/tfprograms/dataset',
       help='Absolute path to dataset.'
     )
     FLAGS, unparsed = parser.parse_known_args()

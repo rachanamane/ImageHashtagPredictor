@@ -6,7 +6,9 @@ import tensorflow as tf
 
 # Unused import - Required for flags - Don't remove
 import shared.flags
+
 FLAGS = tf.app.flags.FLAGS
+
 
 def _read_hashtags(file, hashtags):
     with open(file, 'r') as f:
@@ -20,6 +22,7 @@ def _read_hashtags(file, hashtags):
                     hashtags[hashtag] += 1
                 else:
                     hashtags[hashtag] = 1
+
 
 def _process_directory(dir, hashtags):
     files = listdir(dir)
@@ -47,10 +50,10 @@ def _write_hashtag_label_set_file(hashtags):
 def _read_hashtag_label_set_file():
     hashtag_id_lookup = {}
     with open(FLAGS.hashtags_output_file, 'r') as f:
-        is_first_line=True
+        is_first_line = True
         for line in f:
             if is_first_line:
-                is_first_line=False
+                is_first_line = False
                 continue
             words = line.strip().split(" ")
             hashtag_id_lookup[words[1]] = int(words[0])
@@ -62,6 +65,7 @@ def _create_hashtag_label_set(should_write=False):
     _process_directory(FLAGS.dataset_dir, hashtags)
     hashtags = dict(sorted(hashtags.items(), key=itemgetter(1), reverse=True)[:FLAGS.label_set_size])
     return _write_hashtag_label_set_file(hashtags)
+
 
 def _get_previous_hashtag_dir():
     with open(FLAGS.hashtags_output_file, 'r') as f:

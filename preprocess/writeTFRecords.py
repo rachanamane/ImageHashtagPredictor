@@ -10,7 +10,7 @@ import shared.flags
 
 FLAGS = tf.app.flags.FLAGS
 
-def int64_feature(value):
+def _int64_feature(value):
     if not isinstance(value, list):
         value = [value]
     return tf.train.Feature(int64_list=tf.train.Int64List(value=value))
