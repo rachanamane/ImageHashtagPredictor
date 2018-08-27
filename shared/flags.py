@@ -9,7 +9,14 @@ flags.DEFINE_string('dataset_dir', '/home/vaibhav/tfprograms/dataset',
 flags.DEFINE_string('tfrecords_dir', '/home/vaibhav/tfprograms/generated/tfrecords',
 					'Directory to store TFRecords.')
 
-flags.DEFINE_string('checkpoint_file', '/home/vaibhav/tfprograms/generated/train.ckpt',
+
+flags.DEFINE_string('train_checkpoint_dir', '/home/vaibhav/tfprograms/generated/checkpoints/train',
+					'Checkpoint directory to save training progress.')
+
+flags.DEFINE_string('eval_checkpoint_dir', '/home/vaibhav/tfprograms/generated/checkpoints/eval',
+					'Checkpoint directory to save training progress.')
+
+flags.DEFINE_string('checkpoint_file', 'train.ckpt',
 					'Checkpoint file to save training progress.')
 
 flags.DEFINE_string('hashtags_output_file', '/home/vaibhav/tfprograms/generated/hashtag_map.txt',

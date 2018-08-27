@@ -7,9 +7,10 @@ import tensorflow as tf
 import model.readTFRecords as readTFRecords
 import model.createmodel as createmodel
 
+from os.path import join
+
 # Unused import - Required for flags - Don't remove
 import shared.flags
-
 FLAGS = tf.app.flags.FLAGS
 
 
@@ -52,7 +53,7 @@ def run_model():
             print("loss: ")
             print(loss_out)
             if i % 20 == 0:
-                saver.save(sess, FLAGS.checkpoint_file)
+                saver.save(sess, join(FLAGS.train_checkpoint_dir, FLAGS.checkpoint_file))
 
         coord.request_stop()
         coord.join(threads)

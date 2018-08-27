@@ -2,7 +2,10 @@ import tensorflow as tf
 from tensorflow.contrib import slim
 
 from model import readTFRecords, createmodel
-from shared.flags import FLAGS
+
+# Unused import - Required for flags - Don't remove
+import shared.flags
+FLAGS = tf.app.flags.FLAGS
 
 if __name__ == '__main__':
     with tf.Graph().as_default():
@@ -35,12 +38,11 @@ if __name__ == '__main__':
             'eval/AP@5': slim.metrics.streaming_sparse_average_precision_at_k(logits, batch_labels, 5),
         })
 
-        logdir = 'train.ckpt'
-        checkpoint_path = tf.train.latest_checkpoint(logdir)
+        checkpoint_path = tf.train.latest_checkpoint(FLAGS.train_checkpoint_dir)
         metric_values = slim.evaluation.evaluate_once(
             master='',
             checkpoint_path=checkpoint_path,
-            logdir=logdir,
+            logdir=FLAGS.eval_checkpoint_dir,
             num_evals=20 // FLAGS.batch_size,
             eval_op=list(names_to_updates.values()),
             final_op=list(names_to_values.values()))
