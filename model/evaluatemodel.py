@@ -7,46 +7,67 @@ from model import readTFRecords, createmodel
 import shared.flags
 FLAGS = tf.app.flags.FLAGS
 
-if __name__ == '__main__':
+
+def _get_top_predictions(logits, k=1):
+    _, indices = tf.nn.top_k(logits, k)
+    return indices
+
+
+def evaluate_model(k=1):
+    image_raw, _, encoded_labels = readTFRecords.read_tf_records("eval")
+
+    image_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, FLAGS.image_width, FLAGS.image_height, 3])
+    encoded_labels_placeholder = tf.placeholder(tf.int64, shape=[FLAGS.batch_size, FLAGS.label_set_size])
+
+    logits = createmodel.logits(image_placeholder)
+    predictions = _get_top_predictions(logits, k)
+
+    saver = tf.train.Saver()
+
+    true_positives=0
+    false_positives=0
+
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+        saver.restore(sess, tf.train.latest_checkpoint(FLAGS.train_checkpoint_dir))
+        coord = tf.train.Coordinator()
+        threads = tf.train.start_queue_runners(coord=coord, sess=sess)
+
+        for i in range(FLAGS.eval_set_size // FLAGS.batch_size):
+            image_out, encoded_labels_out = sess.run([image_raw, encoded_labels])
+
+            logits_out, predictions_out = sess.run([logits, predictions],
+                                  feed_dict={
+                                      image_placeholder: image_out,
+                                      encoded_labels_placeholder: encoded_labels_out})
+
+            #print(predictions_out)
+
+            for i in range(FLAGS.batch_size):
+                for j in range(k):
+                    #print(predictions_out[i][j])
+                    #print[a for a in range(299) if encoded_labels_out[i][a] == 1]
+                    #print(encoded_labels_out[i][predictions_out[i][j]])
+                    if encoded_labels_out[i][predictions_out[i][j]] == 1:
+                        true_positives += 1
+                    else:
+                        false_positives += 1
+                    #print("True: %s, False: %s" % (true_positives, false_positives))
+                    #print("----------------")
+
+        print ("Precision for top %s labels: %s%%" % (k, true_positives * 100.0 / (true_positives + false_positives)))
+
+        coord.request_stop()
+        coord.join(threads)
+        sess.close()
+
+
+def main():
+    tf.reset_default_graph()
     with tf.Graph().as_default():
         tf.logging.set_verbosity(tf.logging.INFO)
+        evaluate_model(k=10)
 
-        batch_x, batch_labels, batch_y = readTFRecords.read_tf_records("eval")
 
-        batch_x = tf.cast(batch_x, tf.float32)
-        logits = createmodel.logits(batch_x)
-        batch_y = tf.cast(batch_y, tf.int64)
-
-        names_to_values, names_to_updates = slim.metrics.aggregate_metric_map({
-            'accuracy': slim.metrics.streaming_accuracy(logits, batch_y),
-            'eval/precision/1': slim.metrics.streaming_sparse_precision_at_k(logits, batch_labels, 1),
-            'eval/precision/2': slim.metrics.streaming_sparse_precision_at_k(logits, batch_labels, 2),
-            'eval/precision/3': slim.metrics.streaming_sparse_precision_at_k(logits, batch_labels, 3),
-            'eval/precision/4': slim.metrics.streaming_sparse_precision_at_k(logits, batch_labels, 4),
-            'eval/precision/5': slim.metrics.streaming_sparse_precision_at_k(logits, batch_labels, 5),
-            'eval/precision/10': slim.metrics.streaming_sparse_precision_at_k(logits, batch_labels, 10),
-            'eval/recall/1': slim.metrics.streaming_sparse_recall_at_k(logits, batch_labels, 1),
-            'eval/recall/2': slim.metrics.streaming_sparse_recall_at_k(logits, batch_labels, 2),
-            'eval/recall/3': slim.metrics.streaming_sparse_recall_at_k(logits, batch_labels, 3),
-            'eval/recall/4': slim.metrics.streaming_sparse_recall_at_k(logits, batch_labels, 4),
-            'eval/recall/5': slim.metrics.streaming_sparse_recall_at_k(logits, batch_labels, 5),
-            'eval/recall/10': slim.metrics.streaming_sparse_recall_at_k(logits, batch_labels, 10),
-            'eval/AP@1': slim.metrics.streaming_sparse_average_precision_at_k(logits, batch_labels, 1),
-            'eval/AP@2': slim.metrics.streaming_sparse_average_precision_at_k(logits, batch_labels, 2),
-            'eval/AP@3': slim.metrics.streaming_sparse_average_precision_at_k(logits, batch_labels, 3),
-            'eval/AP@4': slim.metrics.streaming_sparse_average_precision_at_k(logits, batch_labels, 4),
-            'eval/AP@5': slim.metrics.streaming_sparse_average_precision_at_k(logits, batch_labels, 5),
-        })
-
-        checkpoint_path = tf.train.latest_checkpoint(FLAGS.train_checkpoint_dir)
-        metric_values = slim.evaluation.evaluate_once(
-            master='',
-            checkpoint_path=checkpoint_path,
-            logdir=FLAGS.eval_checkpoint_dir,
-            num_evals=20 // FLAGS.batch_size,
-            eval_op=list(names_to_updates.values()),
-            final_op=list(names_to_values.values()))
-
-        names_to_values = dict(zip(list(names_to_values.keys()), metric_values))
-        for name in sorted(names_to_values):
-            print('%s: %f' % (name, names_to_values[name]))
+if __name__ == "__main__":
+    main()

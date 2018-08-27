@@ -1,5 +1,5 @@
 from shared.features import ImageHashtagFeatures
-from shared.SingleImageObject import SingleImageObject
+from shared.singleimageobject import SingleImageObject
 
 import numpy as np
 import tensorflow as tf
@@ -22,7 +22,6 @@ def run_model():
 
     logits = createmodel.logits(image_placeholder)
     loss = createmodel.loss(logits, encoded_labels_placeholder)
-    #loss = tf.losses.mean_squared_error(labels=encoded_labels_placeholder, predictions=logits)
 
     train_step = tf.train.GradientDescentOptimizer(0.0005).minimize(loss)
 
@@ -38,7 +37,7 @@ def run_model():
         threads = tf.train.start_queue_runners(coord=coord, sess=sess)
 
         # TODO: Update 1 to something appropriate
-        for i in range(FLAGS.training_set_size * 1):
+        for i in range((FLAGS.training_set_size * 1) // FLAGS.batch_size):
             image_out, encoded_labels_out = sess.run([image_raw, encoded_labels])
 
             _, infer_out, loss_out = sess.run(

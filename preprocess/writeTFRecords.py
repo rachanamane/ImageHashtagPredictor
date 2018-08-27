@@ -96,8 +96,6 @@ def main():
         raise Exception("Please reduce training or evaluation size. Total images available are %s" % (len(image_and_hashtags)))
     train_image_and_hashtags = [image_and_hashtags[i] for i in range(0, FLAGS.training_set_size)]
     eval_image_and_hashtags = [image_and_hashtags[i] for i in range(FLAGS.training_set_size, FLAGS.training_set_size + FLAGS.eval_set_size)]
-    print(len(train_image_and_hashtags))
-    print(len(eval_image_and_hashtags))
     _process_dataset('train', train_image_and_hashtags)
     _process_dataset('eval', eval_image_and_hashtags)
 

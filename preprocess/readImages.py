@@ -18,8 +18,7 @@ def _read_hash_tags(hash_tag_filepath, hashtag_id_lookup):
                 hashtag = line[1:].lower()
                 if hashtag and hashtag in hashtag_id_lookup:
                     hash_tags.append(hashtag_id_lookup[hashtag])
-    # TODO: Remove duplicates
-    return sorted(hash_tags)
+    return sorted(list(set(hash_tags)))
 
 
 def _read_image_and_tags(file_path, image_and_tags, hashtag_id_lookup):

@@ -3,23 +3,23 @@ import tensorflow as tf
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('dataset_dir', '/home/vaibhav/tfprograms/dataset',
+flags.DEFINE_string('dataset_dir', '/Users/namitr/tfprograms/dataset/dogsofinstagram',
 					'Directory containing images and tags.')
 
-flags.DEFINE_string('tfrecords_dir', '/home/vaibhav/tfprograms/generated/tfrecords',
+flags.DEFINE_string('tfrecords_dir', '/Users/namitr/tfprograms/generated/tfrecords',
 					'Directory to store TFRecords.')
 
 
-flags.DEFINE_string('train_checkpoint_dir', '/home/vaibhav/tfprograms/generated/checkpoints/train',
+flags.DEFINE_string('train_checkpoint_dir', '/Users/namitr/tfprograms/generated/checkpoints/train',
 					'Checkpoint directory to save training progress.')
 
-flags.DEFINE_string('eval_checkpoint_dir', '/home/vaibhav/tfprograms/generated/checkpoints/eval',
+flags.DEFINE_string('eval_checkpoint_dir', '/Users/namitr/tfprograms/generated/checkpoints/eval',
 					'Checkpoint directory to save training progress.')
 
 flags.DEFINE_string('checkpoint_file', 'train.ckpt',
 					'Checkpoint file to save training progress.')
 
-flags.DEFINE_string('hashtags_output_file', '/home/vaibhav/tfprograms/generated/hashtag_map.txt',
+flags.DEFINE_string('hashtags_output_file', '/Users/namitr/tfprograms/generated/hashtag_map.txt',
 					'Hashtags used for training.')
 
 flags.DEFINE_integer('training_set_size', 100, 'Training set size.')
