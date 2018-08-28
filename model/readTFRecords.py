@@ -30,13 +30,22 @@ def get_tfrecord_filenames(mode):
     return [os.path.join(FLAGS.tfrecords_dir, x) for x in files if x.endswith(".tfrecord") and x.startswith(mode)]
 
 
-def read_tf_records(mode):
+def read_tf_records(mode, is_training):
     file_names = get_tfrecord_filenames(mode)
     filename_queue = tf.train.string_input_producer(file_names)
     image_object = read_image_from_tfrecord(filename_queue)
-    batch_image, batch_labels, batch_encoded_labels = tf.train.batch(
+    if is_training:
+        min_queue_examples = int(FLAGS.training_set_size * 0.2)
+        batch_image, batch_labels, batch_encoded_labels = tf.train.shuffle_batch(
             [image_object.image_raw, image_object.labels, image_object.encoded_labels],
             batch_size=FLAGS.batch_size,
-            num_threads=5)
-
-    return batch_image, batch_labels, batch_encoded_labels
+            num_threads=5,
+            capacity=min_queue_examples + 3 * FLAGS.batch_size,
+            min_after_dequeue=min_queue_examples)
+        return batch_image, batch_labels, batch_encoded_labels
+    else:
+        batch_image, batch_labels, batch_encoded_labels = tf.train.batch(
+                [image_object.image_raw, image_object.labels, image_object.encoded_labels],
+                batch_size=FLAGS.batch_size,
+                num_threads=5)
+        return batch_image, batch_labels, batch_encoded_labels

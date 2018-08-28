@@ -15,7 +15,7 @@ def _get_top_predictions(logits, k=1):
 
 def evaluate_model():
     top_k = 10
-    image_raw, _, encoded_labels = readTFRecords.read_tf_records("eval")
+    image_raw, _, encoded_labels = readTFRecords.read_tf_records("eval", is_training=False)
 
     image_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, FLAGS.image_width, FLAGS.image_height, 3])
     encoded_labels_placeholder = tf.placeholder(tf.int64, shape=[FLAGS.batch_size, FLAGS.label_set_size])
