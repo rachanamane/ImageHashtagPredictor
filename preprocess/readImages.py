@@ -33,7 +33,7 @@ def _read_directories_recursive(root_path, image_and_tags, hashtag_id_lookup):
     files = listdir(root_path)
     for file in files:
         file_path = join(root_path, file)
-        if isdir(file_path):
+        if isdir(file_path) and file != "extra" and file != "original":
             _read_directories_recursive(file_path, image_and_tags, hashtag_id_lookup)
         elif isfile(file_path):
             _read_image_and_tags(file_path, image_and_tags, hashtag_id_lookup)

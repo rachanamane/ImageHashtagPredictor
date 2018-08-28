@@ -21,8 +21,8 @@ flags.DEFINE_string('checkpoint_file', 'train.ckpt',
 flags.DEFINE_string('hashtags_output_file', '/home/vaibhav/tfprograms/generated/hashtag_map.txt',
 					'Hashtags used for training.')
 
-flags.DEFINE_integer('training_set_size', 15000, 'Training set size.')
-flags.DEFINE_integer('eval_set_size', 2000, 'Evaluation set size.')
+flags.DEFINE_integer('training_set_size', 100, 'Training set size.')
+flags.DEFINE_integer('eval_set_size', 50, 'Evaluation set size.')
 
 flags.DEFINE_integer('image_width', 299, 'Image width after cropping')
 flags.DEFINE_integer('image_height', 299, 'Image height after cropping')
@@ -30,3 +30,6 @@ flags.DEFINE_integer('image_height', 299, 'Image height after cropping')
 flags.DEFINE_integer('batch_size', 25, 'Images to process in 1 batch')
 
 flags.DEFINE_integer('label_set_size', 150, 'Number of labels in training/evaluation set')
+
+flags.DEFINE_integer('train_write_shards', 10, 'Number of shards for training data')
+flags.DEFINE_integer('eval_write_shards', 2, 'Number of shards for training data')

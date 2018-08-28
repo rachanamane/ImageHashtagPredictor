@@ -1,6 +1,8 @@
 import numpy as np
 import os
+import sys
 import tensorflow as tf
+import threading
 
 import preprocess.readImages as readImages
 from shared.features import ImageHashtagFeatures
@@ -37,57 +39,76 @@ def _convert_to_example(file_path, image_buffer, hashtags, height, width):
     }))
 
 
-def _process_single_image(file_path):
+def _process_single_image(file_path, sess):
     # TODO: Try changing rb to r
     with tf.gfile.FastGFile(file_path, 'rb') as f:
         image_data = f.read()
 
-    g = tf.Graph()
-    with g.as_default():
-        tf.logging.set_verbosity(tf.logging.ERROR)
-        sess = tf.Session()
+    image_encoded = tf.placeholder(dtype=tf.string)
 
-        image_encoded = tf.placeholder(dtype=tf.string)
+    image_raw = tf.image.decode_jpeg(image_encoded, channels=3)  # channels = 3 means RGB
 
-        image_raw = tf.image.decode_jpeg(image_encoded, channels=3)  # channels = 3 means RGB
+    # TODO: Preserve aspect ratio here
+    resized_image = tf.image.resize_image_with_crop_or_pad(image_raw, FLAGS.image_width, FLAGS.image_height)
+    encoded_image = tf.image.encode_jpeg(resized_image, format='rgb', quality=100)
 
-        # TODO: Preserve aspect ratio here
-        resized_image = tf.image.resize_image_with_crop_or_pad(image_raw, FLAGS.image_width, FLAGS.image_height)
-        encoded_image = tf.image.encode_jpeg(resized_image, format='rgb', quality=100)
+    img = sess.run(resized_image, feed_dict={image_encoded: image_data})
 
-        sess.run(tf.initialize_all_variables())
-        img = sess.run(resized_image, feed_dict={image_encoded: image_data})
+    assert len(resized_image.get_shape()) == 3
+    height = int(resized_image.get_shape()[0])
+    width = int(resized_image.get_shape()[1])
+    assert resized_image.get_shape()[2] == 3
 
-        assert len(resized_image.get_shape()) == 3
-        height = int(resized_image.get_shape()[0])
-        width = int(resized_image.get_shape()[1])
-        assert resized_image.get_shape()[2] == 3
+    img = sess.run(encoded_image, feed_dict={image_encoded: image_data})
 
-        img = sess.run(encoded_image, feed_dict={image_encoded: image_data})
-
-        sess.close()
-        return img, height, width
+    return img, height, width
 
 
-def _create_tf_record_filename(mode):
-    return '%s-image-features.tfrecord' % mode
+def _create_tf_record_filename(mode, shard_index, num_shards):
+    return '%s-image-features-%.3d-of-%.3d.tfrecord' % (mode, shard_index, num_shards)
+    #return '%s-image-features.tfrecord' % mode
 
 
-def _process_dataset(mode, image_and_hashtags):
-    output_file = os.path.join(FLAGS.tfrecords_dir, _create_tf_record_filename(mode))
+def _process_dataset_batch(mode, image_and_hashtags, thread_index, images_per_shard, num_shards):
+    output_file = os.path.join(FLAGS.tfrecords_dir, _create_tf_record_filename(mode, thread_index, num_shards))
     writer = tf.python_io.TFRecordWriter(output_file)
 
-    index = 0
-    for file_path, hashtags in image_and_hashtags:
-        if len(hashtags) == 0:
-            continue
-        image_buffer, height, width = _process_single_image(file_path)
+    image_start_index = thread_index * images_per_shard
+    image_end_index = image_start_index + images_per_shard
+
+    sess = tf.Session()
+    sess.run(tf.global_variables_initializer())
+
+    images_processed = 0
+    for index in range(image_start_index, image_end_index):
+        file_path, hashtags = image_and_hashtags[index]
+        image_buffer, height, width = _process_single_image(file_path, sess)
         example = _convert_to_example(file_path, image_buffer, hashtags, height, width)
         writer.write(example.SerializeToString())
-        index += 1
-        if not index % 20:
-            print("Processed %s %s images" % (index, mode))
+        images_processed += 1
+        if images_processed % 20 == 0:
+            print("Processed %s %s images in thread %s" % (images_processed, mode, thread_index))
+            sys.stdout.flush()
 
+    sess.close()
+
+def _process_dataset(mode, image_and_hashtags, num_shards):
+    if len(image_and_hashtags) % num_shards != 0:
+        raise Exception("Number of records (%s) not divisible by shards (%s) for %s " % (len(image_and_hashtags), num_shards, mode))
+    images_per_shard = len(image_and_hashtags) / num_shards
+
+    print("Launching %s threads for %s. Each thread will process %s images" % (num_shards, mode, images_per_shard))
+    sys.stdout.flush()
+    coord = tf.train.Coordinator()
+
+    threads = []
+    for thread_index in range(num_shards):
+        args = (mode, image_and_hashtags, thread_index, images_per_shard, num_shards)
+        t = threading.Thread(target=_process_dataset_batch, args=args)
+        t.start()
+        threads.append(t)
+
+    coord.join(threads)
 
 def main():
     image_and_hashtags = readImages.read_all_directories(FLAGS.dataset_dir)
@@ -96,8 +117,13 @@ def main():
         raise Exception("Please reduce training or evaluation size. Total images available are %s" % (len(image_and_hashtags)))
     train_image_and_hashtags = [image_and_hashtags[i] for i in range(0, FLAGS.training_set_size)]
     eval_image_and_hashtags = [image_and_hashtags[i] for i in range(FLAGS.training_set_size, FLAGS.training_set_size + FLAGS.eval_set_size)]
-    _process_dataset('train', train_image_and_hashtags)
-    _process_dataset('eval', eval_image_and_hashtags)
+
+    tf.reset_default_graph()
+    with tf.Graph().as_default():
+        tf.logging.set_verbosity(tf.logging.INFO)
+        #main()
+        _process_dataset('train', train_image_and_hashtags, FLAGS.train_write_shards)
+        _process_dataset('eval', eval_image_and_hashtags, FLAGS.eval_write_shards)
 
 
 if __name__ == "__main__":
