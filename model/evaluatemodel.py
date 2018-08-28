@@ -20,7 +20,9 @@ def evaluate_model():
     encoded_labels_placeholder = tf.placeholder(tf.int64, shape=[FLAGS.batch_size, FLAGS.label_set_size])
 
     logits = createmodel.logits(image_placeholder)
-    predictions = _get_top_predictions(logits, 10)
+    logits_sig = tf.nn.sigmoid(logits)
+    predictions = _get_top_predictions(logits_sig, 10)
+    #predictions = _get_top_predictions(logits, 10)
 
     saver = tf.train.Saver()
 
@@ -39,7 +41,7 @@ def evaluate_model():
         for eval_step in range(FLAGS.eval_set_size // FLAGS.batch_size):
             image_out, encoded_labels_out = sess.run([image_raw, encoded_labels])
 
-            logits_out, predictions_out = sess.run([logits, predictions],
+            _, _, predictions_out = sess.run([logits, logits_sig, predictions],
                                   feed_dict={
                                       image_placeholder: image_out,
                                       encoded_labels_placeholder: encoded_labels_out})

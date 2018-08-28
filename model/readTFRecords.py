@@ -31,7 +31,9 @@ def get_tfrecord_filenames(mode):
 
 
 def read_tf_records(mode):
-    filename_queue = tf.train.string_input_producer(get_tfrecord_filenames(mode))
+    file_names = get_tfrecord_filenames(mode)
+    print(file_names)
+    filename_queue = tf.train.string_input_producer(file_names)
     image_object = read_image_from_tfrecord(filename_queue)
     batch_image, batch_labels, batch_encoded_labels = tf.train.batch(
             [image_object.image_raw, image_object.labels, image_object.encoded_labels],

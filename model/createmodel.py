@@ -49,8 +49,8 @@ def logits(image, print_debug=True):
           filters=current_filters,
           kernel_size=[6, 6],
           activation=tf.nn.relu)
-    current_tensor_width = current_tensor_width - 5 + 1
-    current_tensor_height = current_tensor_height - 5 + 1
+    current_tensor_width = current_tensor_width - 6 + 1
+    current_tensor_height = current_tensor_height - 6 + 1
     if print_debug:
         print("conv2 %s" % conv2.shape)
 
@@ -80,7 +80,8 @@ def logits(image, print_debug=True):
 
     logits = tf.layers.dense(inputs=dense1, units=FLAGS.label_set_size)
 
-    return tf.nn.sigmoid(logits)
+    return logits
+    #return tf.nn.sigmoid(logits)
 
 
 def loss(logits, labels):

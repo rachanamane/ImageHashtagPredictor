@@ -24,11 +24,12 @@ def run_model():
     logits = createmodel.logits(image_placeholder)
     loss = createmodel.loss(logits, encoded_labels_placeholder)
 
-    train_step = tf.train.AdamOptimizer(0.0005).minimize(loss)
+    train_step = tf.train.AdamOptimizer(0.001).minimize(loss)
 
     saver = tf.train.Saver()
 
     start_time = time.time()
+    prev_time = start_time
     with tf.Session() as sess:
         # Visualize the graph through tensorboard.
         #file_writer = tf.summary.FileWriter("./logs", sess.graph)
@@ -38,9 +39,8 @@ def run_model():
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord, sess=sess)
 
-        steps = (FLAGS.training_set_size * 1) // FLAGS.batch_size
+        steps = (FLAGS.training_set_size // FLAGS.batch_size)
         print("Running %s steps" % steps)
-        # TODO: Update 1 to something appropriate
         for i in range(steps):
             image_out, encoded_labels_out = sess.run([image_raw, encoded_labels])
 
@@ -53,8 +53,11 @@ def run_model():
             print("Completed %s of %s steps. Loss: %s" % (i, steps, loss_out))
             if i % 10 == 9:
                 saver.save(sess, join(FLAGS.train_checkpoint_dir, FLAGS.checkpoint_file))
-                duration = time.time() - start_time
-                print("Completed %s seconds" % duration)
+                cur_time = time.time()
+                duration = cur_time - start_time
+                duration_prev = cur_time - prev_time
+                prev_time = cur_time
+                print("Completed %s seconds. %s seconds for last 10 batches" % (duration, duration_prev))
 
         coord.request_stop()
         coord.join(threads)

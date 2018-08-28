@@ -51,7 +51,9 @@ def evaluate_model(image_data, hashtag_name_lookup, real_hashtags):
     image_reshaped = tf.reshape(image_placeholder, [1, FLAGS.image_width, FLAGS.image_height, 3])
 
     logits = createmodel.logits(image_reshaped, print_debug=False)
-    predictions = _get_top_predictions(logits, FLAGS.predictions_count)
+    logits_sig = tf.nn.sigmoid(logits)
+    predictions = _get_top_predictions(logits_sig, FLAGS.predictions_count)
+    #predictions = _get_top_predictions(logits, FLAGS.predictions_count)
 
     saver = tf.train.Saver()
     with tf.Session() as sess:
@@ -61,7 +63,7 @@ def evaluate_model(image_data, hashtag_name_lookup, real_hashtags):
         image_cropped_out = sess.run(image_cropped, feed_dict={image_data_placeholder: image_data})
         _ = sess.run(image_reshaped, feed_dict={image_placeholder: image_cropped_out})
 
-        logits_out, predictions_out = sess.run([logits, predictions],
+        _, logits_sig_out, predictions_out = sess.run([logits, logits_sig, predictions],
                               feed_dict={image_placeholder: image_cropped_out})
 
         print("\n---------------   Results ---------------------\n")
@@ -70,7 +72,7 @@ def evaluate_model(image_data, hashtag_name_lookup, real_hashtags):
         for i in range(FLAGS.predictions_count):
             print("%20s: %4s  %s" %
                   (hashtag_name_lookup[predictions_out[0][i]],
-                   logits_out[0][predictions_out[0][i]],
+                   logits_sig_out[0][predictions_out[0][i]],
                    hashtag_name_lookup[predictions_out[0][i]] in real_hashtags))
 
         sess.close()
