@@ -29,10 +29,10 @@ def _create_encoded_hashtags(hashtags):
     return ret.tolist()
 
 
-def _convert_to_example(file_path, image_buffer, hashtags, height, width):
+def _convert_to_example(file_path, image_buffer, hashtags):
     return tf.train.Example(features=tf.train.Features(feature={
-        ImageHashtagFeatures.heightFeature: _int64_feature(height),
-        ImageHashtagFeatures.widthFeature: _int64_feature(width),
+        #ImageHashtagFeatures.heightFeature: _int64_feature(height),
+        #ImageHashtagFeatures.widthFeature: _int64_feature(width),
         ImageHashtagFeatures.imageRawFeature: _bytes_feature(image_buffer),
         ImageHashtagFeatures.labelsFeature: _int64_feature(hashtags),
         ImageHashtagFeatures.encodedLabelsFeature: _int64_feature(_create_encoded_hashtags(hashtags)),
@@ -43,13 +43,16 @@ def _process_single_image(file_path, sess):
     # TODO: Try changing rb to r
     with tf.gfile.FastGFile(file_path, 'rb') as f:
         image_data = f.read()
+        return image_data
+
+    '''
+    # Removing this, and resizing will be done when reading the TF records (during train/evaluation)
 
     image_encoded = tf.placeholder(dtype=tf.string)
 
     image_raw = tf.image.decode_jpeg(image_encoded, channels=3)  # channels = 3 means RGB
 
-    # TODO: Preserve aspect ratio here
-    resized_image = tf.image.resize_image_with_crop_or_pad(image_raw, FLAGS.image_width, FLAGS.image_height)
+    resized_image = tf.image.resize_images(image_raw, [FLAGS.image_height, FLAGS.image_width])
     encoded_image = tf.image.encode_jpeg(resized_image, format='rgb', quality=100)
 
     img = sess.run(resized_image, feed_dict={image_encoded: image_data})
@@ -62,6 +65,7 @@ def _process_single_image(file_path, sess):
     img = sess.run(encoded_image, feed_dict={image_encoded: image_data})
 
     return img, height, width
+    '''
 
 
 def _create_tf_record_filename(mode, shard_index, num_shards):
@@ -82,8 +86,8 @@ def _process_dataset_batch(mode, image_and_hashtags, thread_index, images_per_sh
     images_processed = 0
     for index in range(image_start_index, image_end_index):
         file_path, hashtags = image_and_hashtags[index]
-        image_buffer, height, width = _process_single_image(file_path, sess)
-        example = _convert_to_example(file_path, image_buffer, hashtags, height, width)
+        image_buffer = _process_single_image(file_path, sess)
+        example = _convert_to_example(file_path, image_buffer, hashtags)
         writer.write(example.SerializeToString())
         images_processed += 1
         if images_processed % 20 == 0:

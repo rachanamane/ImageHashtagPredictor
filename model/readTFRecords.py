@@ -17,8 +17,8 @@ def read_image_from_tfrecord(filename_queue):
     reader = tf.TFRecordReader()
     _, serialized_example = reader.read(filename_queue)
     features_dict = tf.parse_single_example(serialized_example, features={
-        ImageHashtagFeatures.heightFeature: tf.FixedLenFeature([], tf.int64),
-        ImageHashtagFeatures.widthFeature: tf.FixedLenFeature([], tf.int64),
+        #ImageHashtagFeatures.heightFeature: tf.FixedLenFeature([], tf.int64),
+        #ImageHashtagFeatures.widthFeature: tf.FixedLenFeature([], tf.int64),
         ImageHashtagFeatures.imageRawFeature: tf.FixedLenFeature([], tf.string),
         ImageHashtagFeatures.labelsFeature: tf.VarLenFeature(tf.int64),
         ImageHashtagFeatures.encodedLabelsFeature: tf.FixedLenFeature([FLAGS.label_set_size], tf.int64),
