@@ -44,7 +44,7 @@ def run_model():
         for i in range(steps):
             image_out, encoded_labels_out = sess.run([image_raw, encoded_labels])
 
-            _, _, loss_out = sess.run(
+            _, logits_out, loss_out = sess.run(
                 [train_step, logits, loss],
                 feed_dict={
                     image_placeholder: image_out,
@@ -58,6 +58,7 @@ def run_model():
                 duration_prev = cur_time - prev_time
                 prev_time = cur_time
                 print("Completed %s seconds. %s seconds for last 10 batches" % (duration, duration_prev))
+                #print(logits_out)
 
         coord.request_stop()
         coord.join(threads)
