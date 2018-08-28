@@ -23,8 +23,13 @@ def _read_hash_tags(hash_tag_filepath, hashtag_id_lookup):
 def _read_image_and_tags(file_path, image_and_tags, hashtag_id_lookup):
     if file_path.endswith(".jpg"):
         hash_tag_filepath = file_path[0:-4] + ".txt"
+        hash_tag_filepath_for_multiple_images = file_path[0:-6] + ".txt"
         if isfile(hash_tag_filepath):
             hashtags = _read_hash_tags(hash_tag_filepath, hashtag_id_lookup)
+            if hashtags:
+                image_and_tags.append((file_path, hashtags))
+        elif isfile(hash_tag_filepath_for_multiple_images) and FLAGS.use_insta_posts_with_multiple_images:
+            hashtags = _read_hash_tags(hash_tag_filepath_for_multiple_images, hashtag_id_lookup)
             if hashtags:
                 image_and_tags.append((file_path, hashtags))
 
