@@ -35,12 +35,13 @@ def read_tf_records(mode, is_training):
     filename_queue = tf.train.string_input_producer(file_names)
     image_object = read_image_from_tfrecord(filename_queue)
     if is_training:
-        min_queue_examples = int(FLAGS.training_set_size * 0.2)
+        min_queue_examples = 5 * FLAGS.batch_size
+        print("Loading %s examples in shuffle_batch queue before training" % min_queue_examples)
         batch_image, batch_labels, batch_encoded_labels = tf.train.shuffle_batch(
             [image_object.image_raw, image_object.labels, image_object.encoded_labels],
             batch_size=FLAGS.batch_size,
             num_threads=5,
-            capacity=min_queue_examples + 3 * FLAGS.batch_size,
+            capacity=min_queue_examples + (2 * FLAGS.batch_size),
             min_after_dequeue=min_queue_examples)
         return batch_image, batch_labels, batch_encoded_labels
     else:
