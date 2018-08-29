@@ -4,6 +4,7 @@ import sys
 import tensorflow as tf
 import threading
 
+import random
 import preprocess.readImages as readImages
 from shared.features import ImageHashtagFeatures
 
@@ -97,6 +98,7 @@ def _process_dataset_batch(mode, image_and_hashtags, thread_index, images_per_sh
     sess.close()
 
 def _process_dataset(mode, image_and_hashtags, num_shards):
+    random.shuffle(image_and_hashtags)
     if len(image_and_hashtags) % num_shards != 0:
         raise Exception("Number of records (%s) not divisible by shards (%s) for %s " % (len(image_and_hashtags), num_shards, mode))
     images_per_shard = len(image_and_hashtags) / num_shards

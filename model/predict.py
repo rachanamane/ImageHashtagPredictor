@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import preprocess.createHashtagsFile as createHashtagsFile
 
-from model import readTFRecords, createmodel
+from model import createmodel
 from os.path import isfile
 
 # Unused import - Required for flags - Don't remove
@@ -10,7 +10,7 @@ import shared.flags
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('image_path', '/Users/namitr/tfprograms/dataset/dogsofinstagram/6256005716_2018-08-08_23-22-22.jpg',
+flags.DEFINE_string('image_path', '/Users/namitr/tfprograms/6256005716_2018-08-08_23-22-22.jpg',
 					'Directory to store TFRecords.')
 flags.DEFINE_integer('predictions_count', 5,
 					'Number of predictions.')
@@ -42,10 +42,10 @@ def _get_real_hashtags(file_path):
         raise Exception("Invalid file %s" % file_path)
 
 
-def evaluate_model(image_data, hashtag_name_lookup, real_hashtags):
+def predict_model(image_data, hashtag_name_lookup, real_hashtags):
     image_data_placeholder = tf.placeholder(dtype=tf.string)
     image_decoded = tf.image.decode_jpeg(image_data_placeholder, channels=3)  # channels = 3 means RGB
-    image_cropped = tf.image.resize_image_with_crop_or_pad(image_decoded, FLAGS.image_width, FLAGS.image_height)
+    image_cropped = tf.image.resize_images(image_decoded, [FLAGS.image_height, FLAGS.image_width])
 
     image_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.image_width, FLAGS.image_height, 3])
     image_reshaped = tf.reshape(image_placeholder, [1, FLAGS.image_width, FLAGS.image_height, 3])
@@ -89,7 +89,7 @@ def main():
     tf.reset_default_graph()
     with tf.Graph().as_default():
         tf.logging.set_verbosity(tf.logging.INFO)
-        evaluate_model(image_data, hashtag_name_lookup, real_hashtags)
+        predict_model(image_data, hashtag_name_lookup, real_hashtags)
 
 
 if __name__ == "__main__":

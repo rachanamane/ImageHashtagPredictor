@@ -17,16 +17,17 @@ def logits(image, print_debug=True):
     # Padding is added to preserve width and height.
     # Input Tensor Shape: [batch_size, 299, 299, 3]
     # Output Tensor Shape: [batch_size, 294, 294, 32]
-    current_filters = 16
+    current_filters = 32
+    kernel_size=4
     conv1 = tf.layers.conv2d(
             inputs=image,
             filters=current_filters,
-            kernel_size=[6, 6],
+            kernel_size=[kernel_size, kernel_size],
             activation=tf.nn.relu)
     if print_debug:
         print("conv1 %s" % conv1.shape)
-    current_tensor_width = current_tensor_width - 6 + 1
-    current_tensor_height = current_tensor_height - 6 + 1
+    current_tensor_width = current_tensor_width - kernel_size + 1
+    current_tensor_height = current_tensor_height - kernel_size + 1
 
     # Pooling Layer #1
     # First max pooling layer with a 2x2 filter and stride of 2
@@ -44,13 +45,14 @@ def logits(image, print_debug=True):
     # Input Tensor Shape: [batch_size, 14, 14, 16]
     # Output Tensor Shape: [batch_size, 14, 14, 32]
     current_filters *= 2
+    kernel_size=5
     conv2 = tf.layers.conv2d(
           inputs=pool1,
           filters=current_filters,
-          kernel_size=[6, 6],
+          kernel_size=[kernel_size, kernel_size],
           activation=tf.nn.relu)
-    current_tensor_width = current_tensor_width - 6 + 1
-    current_tensor_height = current_tensor_height - 6 + 1
+    current_tensor_width = current_tensor_width - kernel_size + 1
+    current_tensor_height = current_tensor_height - kernel_size + 1
     if print_debug:
         print("conv2 %s" % conv2.shape)
 
@@ -64,15 +66,15 @@ def logits(image, print_debug=True):
     if print_debug:
         print("pool2 %s" % pool2.shape)
 
-    pool2_flat = tf.reshape(pool2, [-1, current_tensor_width * current_tensor_height * current_filters])
+    pool_flat = tf.reshape(pool2, [-1, current_tensor_width * current_tensor_height * current_filters])
     if print_debug:
-        print("pool2_flat %s" % pool2_flat.shape)
+        print("pool_flat %s" % pool_flat.shape)
 
     # Dense Layer
     # Densely connected layer with 1024 neurons
     # Input Tensor Shape: [batch_size, 7 * 7 * 64]
     # Output Tensor Shape: [batch_size, 1024]
-    dense1 = tf.layers.dense(inputs=pool2_flat, units=512, activation=tf.nn.relu)
+    dense1 = tf.layers.dense(inputs=pool_flat, units=1024, activation=tf.nn.relu)
     if print_debug:
         print("dense1 %s" % dense1.shape)
 
