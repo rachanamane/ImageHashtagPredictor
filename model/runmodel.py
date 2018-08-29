@@ -57,7 +57,10 @@ def run_model():
                 duration = cur_time - start_time
                 duration_prev = cur_time - prev_time
                 prev_time = cur_time
+                estimated_completion_epoch = cur_time + ((steps - i) * duration_prev / 10)
+                estimated_completion = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(estimated_completion_epoch))
                 print("Completed %s seconds. %s seconds for last 10 batches" % (duration, duration_prev))
+                print("Estimated completion time: %s" % (estimated_completion))
                 #print(logits_out)
 
         coord.request_stop()
