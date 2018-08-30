@@ -1,7 +1,9 @@
 import numpy as np
 import tensorflow as tf
 
+import model.util as util
 from model import readTFRecords, createmodel
+
 
 # Unused import - Required for flags - Don't remove
 import shared.flags
@@ -33,11 +35,14 @@ def evaluate_model():
     # TODO: Maybe calculate accuracy too:
     # https://stackoverflow.com/questions/50285883/tensorflow-cross-entropy-for-multi-labels-classification
 
+    histogram = np.zeros(FLAGS.label_set_size)
+
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         saver.restore(sess, tf.train.latest_checkpoint(FLAGS.train_checkpoint_dir))
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord, sess=sess)
+        util.printVars(sess)
 
         steps = FLAGS.eval_set_size // (FLAGS.batch_size)
         print("Evaluating in %s steps" % steps)
@@ -50,8 +55,8 @@ def evaluate_model():
                                       encoded_labels_placeholder: encoded_labels_out})
 
             #print(predictions_out)
-
             for i in range(FLAGS.batch_size):
+                histogram[predictions_out[i][0]] += 1
                 for k in range(top_k):
                     for j in range(k+1):
                         #print(predictions_out[i][j])
@@ -67,8 +72,13 @@ def evaluate_model():
             if eval_step % 20 == 19:
                 print ("Precision for top 1 labels: %s%%" % (true_positives[0] * 100.0 / (true_positives[0] + false_positives[0])))
 
+            util.printVars(sess)
+
         for k in range(top_k):
             print ("Precision for top %s labels: %s%%" % (k+1, true_positives[k] * 100.0 / (true_positives[k] + false_positives[k])))
+        print ("Histogram of first prediction:")
+        for i in range(FLAGS.label_set_size):
+            print("%s: %s" % (i, histogram[i]))
 
         coord.request_stop()
         coord.join(threads)

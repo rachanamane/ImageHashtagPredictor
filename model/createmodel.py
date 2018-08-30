@@ -5,35 +5,39 @@ import shared.flags
 FLAGS = tf.app.flags.FLAGS
 
 pool_size = 2
+padding = "same"
 
 def logits(image, print_debug=True):
     current_tensor_width = FLAGS.image_width
     current_tensor_height = FLAGS.image_height
     if print_debug:
-        print(image.shape)
+        print("Image shape %s" % image.shape)
 
     # Convolutional Layer #1
-    # Computes 16 features using a 6x6 filter with ReLU activation.
+    # Computes 32 features using a 5x5 filter with ReLU activation.
     # Padding is added to preserve width and height.
     # Input Tensor Shape: [batch_size, 299, 299, 3]
-    # Output Tensor Shape: [batch_size, 294, 294, 32]
+    # Output Tensor Shape: [batch_size, 299, 299, 32]
+    kernel_size=5
     current_filters = 32
-    kernel_size=4
     conv1 = tf.layers.conv2d(
             inputs=image,
             filters=current_filters,
             kernel_size=[kernel_size, kernel_size],
-            activation=tf.nn.relu)
+            bias_initializer=tf.random_normal_initializer(stddev=0.1),
+            padding=padding,
+            activation=tf.nn.relu,
+            name="my_Conv_layer_1")
     if print_debug:
         print("conv1 %s" % conv1.shape)
-    current_tensor_width = current_tensor_width - kernel_size + 1
-    current_tensor_height = current_tensor_height - kernel_size + 1
+    current_tensor_width = current_tensor_width if padding == "same" else current_tensor_width - kernel_size + 1
+    current_tensor_height = current_tensor_height if padding == "same" else current_tensor_height - kernel_size + 1
 
     # Pooling Layer #1
     # First max pooling layer with a 2x2 filter and stride of 2
-    # Input Tensor Shape: [batch_size, 28, 28, 32]
-    # Output Tensor Shape: [batch_size, 14, 14, 32]
-    pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=pool_size, strides=pool_size)
+    # Input Tensor Shape: [batch_size, 299, 299, 32]
+    # Output Tensor Shape: [batch_size, 149, 149, 32]
+    pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=pool_size, strides=pool_size, name="my_Pool_layer_1")
     current_tensor_width /= pool_size
     current_tensor_height /= pool_size
     if print_debug:
@@ -42,48 +46,51 @@ def logits(image, print_debug=True):
     # Convolutional Layer #2
     # Computes 64 features using a 5x5 filter.
     # Padding is added to preserve width and height.
-    # Input Tensor Shape: [batch_size, 14, 14, 16]
-    # Output Tensor Shape: [batch_size, 14, 14, 32]
+    # Input Tensor Shape: [batch_size, 149, 149, 32]
+    # Output Tensor Shape: [batch_size, 149, 149, 64]
     current_filters *= 2
     kernel_size=5
     conv2 = tf.layers.conv2d(
           inputs=pool1,
           filters=current_filters,
           kernel_size=[kernel_size, kernel_size],
-          activation=tf.nn.relu)
-    current_tensor_width = current_tensor_width - kernel_size + 1
-    current_tensor_height = current_tensor_height - kernel_size + 1
+          bias_initializer=tf.random_normal_initializer(stddev=0.1),
+          padding=padding,
+          activation=tf.nn.relu,
+          name="my_Conv_layer_2")
+    current_tensor_width = current_tensor_width if padding == "same" else current_tensor_width - kernel_size + 1
+    current_tensor_height = current_tensor_height if padding == "same" else current_tensor_height - kernel_size + 1
     if print_debug:
         print("conv2 %s" % conv2.shape)
 
     # Pooling Layer #2
     # Second max pooling layer with a 2x2 filter and stride of 2
-    # Input Tensor Shape: [batch_size, 14, 14, 64]
-    # Output Tensor Shape: [batch_size, 7, 7, 64]
-    pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=pool_size, strides=pool_size)
+    # Input Tensor Shape: [batch_size, 149, 149, 64]
+    # Output Tensor Shape: [batch_size, 74, 74, 64]
+    pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=pool_size, strides=pool_size, name="my_Pool_layer_2")
     current_tensor_width /= pool_size
     current_tensor_height /= pool_size
     if print_debug:
         print("pool2 %s" % pool2.shape)
 
-    pool_flat = tf.reshape(pool2, [-1, current_tensor_width * current_tensor_height * current_filters])
+    # [-1, current_tensor_width * current_tensor_height * current_filters],
+    pool_flat = tf.layers.flatten(pool2, name="my_Pool_layer_flat")
     if print_debug:
         print("pool_flat %s" % pool_flat.shape)
 
     # Dense Layer
     # Densely connected layer with 1024 neurons
-    # Input Tensor Shape: [batch_size, 7 * 7 * 64]
+    # Input Tensor Shape: [batch_size, 74 * 74 * 64]
     # Output Tensor Shape: [batch_size, 1024]
-    dense1 = tf.layers.dense(inputs=pool_flat, units=1024, activation=tf.nn.relu)
+    dense1 = tf.layers.dense(inputs=pool_flat, units=1024, activation=tf.nn.relu, name="my_Dense_layer_1")
     if print_debug:
         print("dense1 %s" % dense1.shape)
 
     # TODO: Consider adding dropout, to remove labels x% of least probable labels
 
-    logits = tf.layers.dense(inputs=dense1, units=FLAGS.label_set_size)
+    logits = tf.layers.dense(inputs=dense1, units=FLAGS.label_set_size, name="my_Logits_layer")
 
     return logits
-    #return tf.nn.sigmoid(logits)
 
 
 def loss(logits, labels):

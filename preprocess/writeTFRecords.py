@@ -98,7 +98,6 @@ def _process_dataset_batch(mode, image_and_hashtags, thread_index, images_per_sh
     sess.close()
 
 def _process_dataset(mode, image_and_hashtags, num_shards):
-    random.shuffle(image_and_hashtags)
     if len(image_and_hashtags) % num_shards != 0:
         raise Exception("Number of records (%s) not divisible by shards (%s) for %s " % (len(image_and_hashtags), num_shards, mode))
     images_per_shard = len(image_and_hashtags) / num_shards
@@ -118,6 +117,7 @@ def _process_dataset(mode, image_and_hashtags, num_shards):
 
 def main():
     image_and_hashtags = readImages.read_all_directories(FLAGS.dataset_dir)
+    random.shuffle(image_and_hashtags)
     # TODO: Remove this and implement batching
     if FLAGS.training_set_size + FLAGS.eval_set_size > len(image_and_hashtags):
         raise Exception("Please reduce training or evaluation size. Total images available are %s" % (len(image_and_hashtags)))
