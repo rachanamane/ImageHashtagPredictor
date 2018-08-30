@@ -72,8 +72,6 @@ def evaluate_model():
             if eval_step % 20 == 19:
                 print ("Precision for top 1 labels: %s%%" % (true_positives[0] * 100.0 / (true_positives[0] + false_positives[0])))
 
-            util.printVars(sess)
-
         for k in range(top_k):
             print ("Precision for top %s labels: %s%%" % (k+1, true_positives[k] * 100.0 / (true_positives[k] + false_positives[k])))
         print ("Histogram of first prediction:")
