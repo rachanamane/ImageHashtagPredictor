@@ -73,8 +73,38 @@ def logits(image, print_debug=True):
     if print_debug:
         print("pool2 %s" % pool2.shape)
 
+    # Convolutional Layer #3
+    # Computes 128 features using a 5x5 filter.
+    # Padding is added to preserve width and height.
+    # Input Tensor Shape: [batch_size, 74, 74, 64]
+    # Output Tensor Shape: [batch_size, 74, 74, 128]
+    current_filters *= 2
+    kernel_size=5
+    conv3 = tf.layers.conv2d(
+          inputs=pool2,
+          filters=current_filters,
+          kernel_size=[kernel_size, kernel_size],
+          bias_initializer=tf.random_normal_initializer(stddev=0.1),
+          padding=padding,
+          activation=tf.nn.relu,
+          name="my_Conv_layer_3")
+    current_tensor_width = current_tensor_width if padding == "same" else current_tensor_width - kernel_size + 1
+    current_tensor_height = current_tensor_height if padding == "same" else current_tensor_height - kernel_size + 1
+    if print_debug:
+        print("conv3 %s" % conv3.shape)
+
+    # Pooling Layer #3
+    # Second max pooling layer with a 2x2 filter and stride of 2
+    # Input Tensor Shape: [batch_size, 74, 74, 128]
+    # Output Tensor Shape: [batch_size, 37, 37, 128]
+    pool3 = tf.layers.max_pooling2d(inputs=conv3, pool_size=pool_size, strides=pool_size, name="my_Pool_layer_3")
+    current_tensor_width /= pool_size
+    current_tensor_height /= pool_size
+    if print_debug:
+        print("pool3 %s" % pool3.shape)
+
     # [-1, current_tensor_width * current_tensor_height * current_filters],
-    pool_flat = tf.layers.flatten(pool2, name="my_Pool_layer_flat")
+    pool_flat = tf.layers.flatten(pool3, name="my_Pool_layer_flat")
     if print_debug:
         print("pool_flat %s" % pool_flat.shape)
 

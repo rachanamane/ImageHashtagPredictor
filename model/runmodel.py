@@ -56,7 +56,7 @@ def run_model(predict_image_data, hashtag_name_lookup):
             print("Completed %s of %s steps. Loss: %s" % (i, steps, loss_out))
             if i % 20 == 19:
                 saver.save(sess, join(FLAGS.train_checkpoint_dir, FLAGS.checkpoint_file))
-                util.printVars(sess)
+                #util.printVars(sess)
                 cur_time = time.time()
                 duration = cur_time - start_time
                 duration_prev = cur_time - prev_time

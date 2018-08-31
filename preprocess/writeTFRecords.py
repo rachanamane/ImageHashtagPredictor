@@ -115,6 +115,15 @@ def _process_dataset(mode, image_and_hashtags, num_shards):
 
     coord.join(threads)
 
+    image_file_names = [x[0].split("/")[-2] for x in image_and_hashtags]
+    dict = {}
+    for x in image_file_names:
+        if x in dict:
+            dict[x] += 1
+        else:
+            dict[x] = 1
+    print("Images by foldername: %s - %s" % (mode, dict))
+
 def main():
     image_and_hashtags = readImages.read_all_directories(FLAGS.dataset_dir)
     random.shuffle(image_and_hashtags)

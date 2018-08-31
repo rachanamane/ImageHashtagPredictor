@@ -21,10 +21,10 @@ flags.DEFINE_string('checkpoint_file', 'train.ckpt',
 flags.DEFINE_string('hashtags_output_file', '/home/vaibhav/tfprograms/generated/hashtag_map.txt',
 					'Hashtags used for training.')
 
-flags.DEFINE_integer('num_epochs', 3, 'Number of epochs')
+flags.DEFINE_integer('num_epochs', 7, 'Number of epochs')
 
-flags.DEFINE_integer('training_set_size', 3000, 'Training set size.')
-flags.DEFINE_integer('eval_set_size', 500, 'Evaluation set size.')
+flags.DEFINE_integer('training_set_size', 10000, 'Training set size.')
+flags.DEFINE_integer('eval_set_size', 2000, 'Evaluation set size.')
 
 flags.DEFINE_integer('image_width', 299, 'Image width after cropping')
 flags.DEFINE_integer('image_height', 299, 'Image height after cropping')
@@ -33,8 +33,8 @@ flags.DEFINE_integer('batch_size', 25, 'Images to process in 1 batch')
 
 flags.DEFINE_integer('label_set_size', 30, 'Number of labels in training/evaluation set')
 
-flags.DEFINE_integer('train_write_shards', 10, 'Number of shards for training data')
-flags.DEFINE_integer('eval_write_shards', 4, 'Number of shards for training data')
+flags.DEFINE_integer('train_write_shards', 40, 'Number of shards for training data')
+flags.DEFINE_integer('eval_write_shards', 20, 'Number of shards for training data')
 
-flags.DEFINE_boolean('use_insta_posts_with_multiple_images', True,
+flags.DEFINE_boolean('use_insta_posts_with_multiple_images', False,
 					 'Use posts that have multiple images in a single post')
