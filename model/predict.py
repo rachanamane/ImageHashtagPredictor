@@ -36,8 +36,13 @@ def _read_hashtag_file(hash_tag_filepath):
 def _get_real_hashtags(file_path):
     if isfile(file_path) and file_path.endswith(".jpg"):
         hash_tag_filepath = file_path[0:-4] + ".txt"
+        hash_tag_filepath_multiple_images = file_path[0:-6] + ".txt"
         if isfile(hash_tag_filepath):
             return _read_hashtag_file(hash_tag_filepath)
+        elif isfile(hash_tag_filepath_multiple_images):
+            return _read_hashtag_file(hash_tag_filepath_multiple_images)
+        else:
+            return []
     else:
         raise Exception("Invalid file %s" % file_path)
 
