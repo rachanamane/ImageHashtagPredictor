@@ -24,6 +24,14 @@ generic_food_indices = [2, 5, 10, 26, 28]
 all_food_indices = [4, 6, 7, 8, 12, 14, 19, 20, 21, 23, 29, 30]
 all_food_indices.extend(generic_food_indices)
 
+similar_indices = [
+    # If current prediction in tuple[0], then any of tuple[1] labels should be counted as true similar positive.
+    (only_dog_indices, all_dog_indices),
+    (only_cat_indices, all_cat_indices),
+    (pet_indices, pet_indices),
+    (all_food_indices, generic_food_indices)
+]
+
 def _get_top_predictions(logits, k=1):
     _, indices = tf.nn.top_k(logits, k)
     return indices
@@ -43,8 +51,10 @@ def evaluate_model():
 
     saver = tf.train.Saver()
 
-    true_positives=np.zeros(top_k)
+    ground_true_positives=np.zeros(top_k)
+    similar_positives=np.zeros(top_k)
     false_positives=np.zeros(top_k)
+    precision_denominator=np.zeros(top_k)
 
     # TODO: Maybe calculate accuracy too:
     # https://stackoverflow.com/questions/50285883/tensorflow-cross-entropy-for-multi-labels-classification
@@ -74,39 +84,35 @@ def evaluate_model():
                 for k in range(top_k):
                     for j in range(k+1):
                         curr_prediction = predictions_out[i][j]
+                        precision_denominator[k] += 1
                         #print(predictions_out[i][j])
                         #print[a for a in range(299) if encoded_labels_out[i][a] == 1]
                         #print(encoded_labels_out[i][predictions_out[i][j]])
                         if encoded_labels_out[i][curr_prediction] == 1:
-                            true_positives[k] += 1
-                        elif curr_prediction in only_dog_indices:
-                            # for dog predictions, if actual labels are any of dog/pet labels, mark true
-                            for dog_index in all_dog_indices:
-                                if encoded_labels_out[i][dog_index] == 1:
-                                    true_positives[k] += 1
-                                    break
-                        elif curr_prediction in only_cat_indices:
-                            # for cat predictions, if actual labels are any of cat/pet labels, mark true
-                            for cat_index in all_cat_indices:
-                                if encoded_labels_out[i][cat_index] == 1:
-                                    true_positives[k] += 1
-                                    break
-                        elif curr_prediction in all_food_indices:
-                            # for food predictions, if actual labels are any of generic food labels, mark true
-                            for generic_food_index in generic_food_indices:
-                                if encoded_labels_out[i][generic_food_index] == 1:
-                                    true_positives[k] += 1
-                                    break
+                            ground_true_positives[k] += 1
+                            similar_positives[k] += 1
                         else:
-                            false_positives[k] += 1
+                            marked_positive=False
+                            for similar_indices_tuple in similar_indices:
+                                if not marked_positive and curr_prediction in similar_indices_tuple[0]:
+                                    for similar_index in similar_indices_tuple[1]:
+                                        if encoded_labels_out[i][similar_index] == 1:
+                                            similar_positives[k] += 1
+                                            marked_positive=True
+                                            break
+                            if not marked_positive:
+                                false_positives[k] += 1
                         #print("True: %s, False: %s" % (true_positives, false_positives))
                         #print("----------------")
 
             if eval_step % 20 == 19:
-                print ("Precision for top 1 labels: %s%%" % (true_positives[0] * 100.0 / (true_positives[0] + false_positives[0])))
+                print ("Precision for top 1 labels (ground truth): %s%%" % (ground_true_positives[0] * 100.0 / precision_denominator[0]))
+                print ("Precision for top 1 labels (similar hashtags counted true positive): %s%%" % (similar_positives[0] * 100.0 / precision_denominator[0]))
 
         for k in range(top_k):
-            print ("Precision for top %s labels: %s%%" % (k+1, true_positives[k] * 100.0 / (true_positives[k] + false_positives[k])))
+            print ("Precision for top 1 labels (ground truth): %s%%" % (ground_true_positives[k] * 100.0 / precision_denominator[k]))
+            print ("Precision for top 1 labels (similar hashtags counted true positive): %s%%" % (similar_positives[k] * 100.0 / precision_denominator[k]))
+
         print ("Histogram of first prediction:")
         for i in range(FLAGS.label_set_size):
             print("%s: %s" % (i, histogram[i]))
