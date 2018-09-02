@@ -4,3 +4,4 @@ class ImageHashtagFeatures:
     labelsFeature = "labels"
     encodedLabelsFeature = "encoded_labels"
     imageRawFeature = "image_raw"
+    userHistory = "user_history"

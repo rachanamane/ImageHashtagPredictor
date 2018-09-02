@@ -8,7 +8,7 @@ import tensorflow as tf
 import shared.flags
 FLAGS = tf.app.flags.FLAGS
 
-def _read_hash_tags(hash_tag_filepath, hashtag_id_lookup):
+def _read_image_metadata(hash_tag_filepath, hashtag_id_lookup):
     hash_tags = []
     with open(hash_tag_filepath, 'r') as f:
         line = f.readline().strip()
@@ -17,35 +17,44 @@ def _read_hash_tags(hash_tag_filepath, hashtag_id_lookup):
             current_hashtag = current_hashtag.lower()
             if current_hashtag and current_hashtag in hashtag_id_lookup:
                 hash_tags.append(hashtag_id_lookup[current_hashtag])
-    return sorted(list(set(hash_tags)))
+        user_id = f.readline().strip()
+    return sorted(list(set(hash_tags))), int(user_id)
 
 
-def _read_image_and_tags(file_path, image_and_tags, hashtag_id_lookup):
+def _read_image_and_tags(file_path, image_and_tags, user_history, hashtag_id_lookup):
     if file_path.endswith(".jpg"):
         hash_tag_filepath = file_path[0:-4] + ".txt"
-        hash_tag_filepath_for_multiple_images = file_path[0:-6] + ".txt"
         if isfile(hash_tag_filepath):
-            hashtags = _read_hash_tags(hash_tag_filepath, hashtag_id_lookup)
+            hashtags, user_id = _read_image_metadata(hash_tag_filepath, hashtag_id_lookup)
             if hashtags:
-                image_and_tags.append((file_path, hashtags))
-        elif isfile(hash_tag_filepath_for_multiple_images) and FLAGS.use_insta_posts_with_multiple_images:
-            hashtags = _read_hash_tags(hash_tag_filepath_for_multiple_images, hashtag_id_lookup)
-            if hashtags:
-                image_and_tags.append((file_path, hashtags))
+                image_and_tags.append((file_path, hashtags, user_id))
+                for hashtag in hashtags:
+                    user_history[user_id][hashtag] += 1
 
 
-def _read_directories_recursive(root_path, image_and_tags, hashtag_id_lookup):
+def _read_directories_recursive(root_path, image_and_tags, user_history, hashtag_id_lookup):
     files = listdir(root_path)
     for file in files:
         file_path = join(root_path, file)
         if isdir(file_path) and file != "extra" and file != "original":
-            _read_directories_recursive(file_path, image_and_tags, hashtag_id_lookup)
+            _read_directories_recursive(file_path, image_and_tags, user_history, hashtag_id_lookup)
         elif isfile(file_path):
-            _read_image_and_tags(file_path, image_and_tags, hashtag_id_lookup)
+            _read_image_and_tags(file_path, image_and_tags, user_history, hashtag_id_lookup)
+
+
+def _create_empty_user_history():
+    user_history = []
+    for i in range(10):
+        user_history.append([])
+        curr_history = user_history[i]
+        for j in range(FLAGS.label_set_size):
+            curr_history.append(0)
+    return user_history
 
 
 def read_all_directories(root_path):
     image_and_tags = []
+    user_history = _create_empty_user_history()
     hashtag_id_lookup = createHashtagsFile.get_hashtag_label_set()
-    _read_directories_recursive(root_path, image_and_tags, hashtag_id_lookup)
-    return image_and_tags
+    _read_directories_recursive(root_path, image_and_tags, user_history, hashtag_id_lookup)
+    return image_and_tags, user_history

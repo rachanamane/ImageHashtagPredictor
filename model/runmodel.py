@@ -19,7 +19,7 @@ def _get_top_predictions(logits, k):
 
 
 def run_model(predict_image_data, hashtag_name_lookup):
-    image_raw, _, encoded_labels = readTFRecords.read_tf_records("train", is_training=True)
+    image_raw, _, encoded_labels, user_history = readTFRecords.read_tf_records("train", is_training=True)
 
     image_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, FLAGS.image_width, FLAGS.image_height, 3])
     encoded_labels_placeholder = tf.placeholder(tf.uint16, shape=[FLAGS.batch_size, FLAGS.label_set_size])

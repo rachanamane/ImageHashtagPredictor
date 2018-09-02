@@ -5,6 +5,7 @@ from shared.features import ImageHashtagFeatures
 import shared.flags
 FLAGS = tf.app.flags.FLAGS
 
+
 class SingleImageObject:
 
     def __init__(self, features_dict):
@@ -17,3 +18,4 @@ class SingleImageObject:
         self.image_raw = image_resized
         self.labels = features_dict[ImageHashtagFeatures.labelsFeature]
         self.encoded_labels = features_dict[ImageHashtagFeatures.encodedLabelsFeature]
+        self.user_history = features_dict[ImageHashtagFeatures.userHistory]

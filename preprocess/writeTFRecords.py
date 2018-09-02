@@ -30,13 +30,14 @@ def _create_encoded_hashtags(hashtags):
     return ret.tolist()
 
 
-def _convert_to_example(file_path, image_buffer, hashtags):
+def _convert_to_example(file_path, image_buffer, hashtags, single_user_history):
     return tf.train.Example(features=tf.train.Features(feature={
         #ImageHashtagFeatures.heightFeature: _int64_feature(height),
         #ImageHashtagFeatures.widthFeature: _int64_feature(width),
         ImageHashtagFeatures.imageRawFeature: _bytes_feature(image_buffer),
         ImageHashtagFeatures.labelsFeature: _int64_feature(hashtags),
         ImageHashtagFeatures.encodedLabelsFeature: _int64_feature(_create_encoded_hashtags(hashtags)),
+        ImageHashtagFeatures.userHistory: _int64_feature(single_user_history)
     }))
 
 
@@ -71,10 +72,9 @@ def _process_single_image(file_path, sess):
 
 def _create_tf_record_filename(mode, shard_index, num_shards):
     return '%s-image-features-%.3d-of-%.3d.tfrecord' % (mode, shard_index, num_shards)
-    #return '%s-image-features.tfrecord' % mode
 
 
-def _process_dataset_batch(mode, image_and_hashtags, thread_index, images_per_shard, num_shards):
+def _process_dataset_batch(mode, image_and_hashtags, thread_index, images_per_shard, num_shards, user_history):
     output_file = os.path.join(FLAGS.tfrecords_dir, _create_tf_record_filename(mode, thread_index, num_shards))
     writer = tf.python_io.TFRecordWriter(output_file)
 
@@ -86,9 +86,9 @@ def _process_dataset_batch(mode, image_and_hashtags, thread_index, images_per_sh
 
     images_processed = 0
     for index in range(image_start_index, image_end_index):
-        file_path, hashtags = image_and_hashtags[index]
+        file_path, hashtags, user_id = image_and_hashtags[index]
         image_buffer = _process_single_image(file_path, sess)
-        example = _convert_to_example(file_path, image_buffer, hashtags)
+        example = _convert_to_example(file_path, image_buffer, hashtags, user_history[user_id])
         writer.write(example.SerializeToString())
         images_processed += 1
         if images_processed % 20 == 0:
@@ -97,7 +97,7 @@ def _process_dataset_batch(mode, image_and_hashtags, thread_index, images_per_sh
 
     sess.close()
 
-def _process_dataset(mode, image_and_hashtags, num_shards):
+def _process_dataset(mode, image_and_hashtags, num_shards, user_history):
     if len(image_and_hashtags) % num_shards != 0:
         raise Exception("Number of records (%s) not divisible by shards (%s) for %s " % (len(image_and_hashtags), num_shards, mode))
     images_per_shard = len(image_and_hashtags) / num_shards
@@ -108,7 +108,7 @@ def _process_dataset(mode, image_and_hashtags, num_shards):
 
     threads = []
     for thread_index in range(num_shards):
-        args = (mode, image_and_hashtags, thread_index, images_per_shard, num_shards)
+        args = (mode, image_and_hashtags, thread_index, images_per_shard, num_shards, user_history)
         t = threading.Thread(target=_process_dataset_batch, args=args)
         t.start()
         threads.append(t)
@@ -124,10 +124,10 @@ def _process_dataset(mode, image_and_hashtags, num_shards):
             dict[x] = 1
     print("Images by foldername: %s - %s" % (mode, dict))
 
+
 def main():
-    image_and_hashtags = readImages.read_all_directories(FLAGS.dataset_dir)
+    image_and_hashtags, user_history = readImages.read_all_directories(FLAGS.dataset_dir)
     random.shuffle(image_and_hashtags)
-    # TODO: Remove this and implement batching
     if FLAGS.training_set_size + FLAGS.eval_set_size > len(image_and_hashtags):
         raise Exception("Please reduce training or evaluation size. Total images available are %s" % (len(image_and_hashtags)))
     train_image_and_hashtags = [image_and_hashtags[i] for i in range(0, FLAGS.training_set_size)]
@@ -136,9 +136,8 @@ def main():
     tf.reset_default_graph()
     with tf.Graph().as_default():
         tf.logging.set_verbosity(tf.logging.INFO)
-        #main()
-        _process_dataset('train', train_image_and_hashtags, FLAGS.train_write_shards)
-        _process_dataset('eval', eval_image_and_hashtags, FLAGS.eval_write_shards)
+        _process_dataset('train', train_image_and_hashtags, FLAGS.train_write_shards, user_history)
+        _process_dataset('eval', eval_image_and_hashtags, FLAGS.eval_write_shards, user_history)
 
 
 if __name__ == "__main__":

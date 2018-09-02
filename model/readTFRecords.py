@@ -22,6 +22,7 @@ def read_image_from_tfrecord(filename_queue):
         ImageHashtagFeatures.imageRawFeature: tf.FixedLenFeature([], tf.string),
         ImageHashtagFeatures.labelsFeature: tf.VarLenFeature(tf.int64),
         ImageHashtagFeatures.encodedLabelsFeature: tf.FixedLenFeature([FLAGS.label_set_size], tf.int64),
+        ImageHashtagFeatures.userHistory: tf.FixedLenFeature([FLAGS.label_set_size], tf.int64),
     })
     return SingleImageObject(features_dict)
 
@@ -37,16 +38,16 @@ def read_tf_records(mode, is_training):
     if is_training:
         min_queue_examples = 5 * FLAGS.batch_size
         print("Loading %s examples in shuffle_batch queue before training" % min_queue_examples)
-        batch_image, batch_labels, batch_encoded_labels = tf.train.shuffle_batch(
-            [image_object.image_raw, image_object.labels, image_object.encoded_labels],
+        batch_image, batch_labels, batch_encoded_labels, batch_user_history = tf.train.shuffle_batch(
+            [image_object.image_raw, image_object.labels, image_object.encoded_labels, image_object.user_history],
             batch_size=FLAGS.batch_size,
             num_threads=5,
             capacity=min_queue_examples + (2 * FLAGS.batch_size),
             min_after_dequeue=min_queue_examples)
-        return batch_image, batch_labels, batch_encoded_labels
+        return batch_image, batch_labels, batch_encoded_labels, batch_user_history
     else:
-        batch_image, batch_labels, batch_encoded_labels = tf.train.batch(
-                [image_object.image_raw, image_object.labels, image_object.encoded_labels],
+        batch_image, batch_labels, batch_encoded_labels, batch_user_history = tf.train.batch(
+                [image_object.image_raw, image_object.labels, image_object.encoded_labels, image_object.user_history],
                 batch_size=FLAGS.batch_size,
                 num_threads=5)
-        return batch_image, batch_labels, batch_encoded_labels
+        return batch_image, batch_labels, batch_encoded_labels, batch_user_history
