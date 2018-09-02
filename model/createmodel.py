@@ -110,7 +110,7 @@ def logits(image, user_history, print_debug=True):
         print("pool_flat %s" % pool_flat.shape)
         print("user_history %s" % user_history.shape)
 
-    weighted_user_history = tf.multiply(tf.constant(1, shape=user_history.shape), user_history)
+    weighted_user_history = tf.multiply(tf.constant(1.0, shape=user_history.shape), user_history)
 
     pool_flat_with_history = tf.concat([pool_flat, weighted_user_history], axis=1, name="my_user_history_concat_layer")
     if print_debug:
