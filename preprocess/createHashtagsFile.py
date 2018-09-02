@@ -12,16 +12,16 @@ FLAGS = tf.app.flags.FLAGS
 
 def _read_hashtags(file, hashtags):
     with open(file, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if line.startswith("#") and ' ' not in line:
-                hashtag = line[1:].lower()
-                if not hashtag:
-                    continue
-                if hashtag in hashtags:
-                    hashtags[hashtag] += 1
-                else:
-                    hashtags[hashtag] = 1
+        line = f.readline().strip()
+        current_hashtags = line.split(",")
+        for hashtag in current_hashtags:
+            hashtag = hashtag.lower()
+            if not hashtag:
+                continue
+            if hashtag in hashtags:
+                hashtags[hashtag] += 1
+            else:
+                hashtags[hashtag] = 1
 
 
 def _process_directory(dir, hashtags):
@@ -86,3 +86,7 @@ def get_hashtag_label_set(force_overwrite=False):
             return _create_hashtag_label_set(should_write=True)
     else:
         return _create_hashtag_label_set(should_write=True)
+
+
+#if __name__ == "__main__":
+#    _create_hashtag_label_set(should_write=True)

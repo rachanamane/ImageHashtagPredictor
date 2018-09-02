@@ -35,7 +35,7 @@ def run_model(predict_image_data, hashtag_name_lookup):
     prev_time = start_time
     with tf.Session() as sess:
         # Visualize the graph through tensorboard.
-        file_writer = tf.summary.FileWriter("./logs_tensorboard", sess.graph)
+        file_writer = tf.summary.FileWriter(FLAGS.tensorboard_logs_dir, sess.graph)
         sess.run(tf.global_variables_initializer())
 
         # saver.restore(sess, FLAGS.checkpoint_file)

@@ -9,7 +9,7 @@ function process_file() {
   local error=`djpeg -fast -grayscale -onepass $1 2>&1 > /dev/null`
   if [[ ! -z $error ]]; then
      echo $1 ": " $error
-     echo "$1" >> ~/tfprograms/bad_filenames.txt
+     echo "$1" >> ~/Desktop/bad_filenames.txt
   #else
   #   echo "No error $1"
   fi
@@ -38,5 +38,5 @@ function process_directory() {
   done
 }
 
-echo "" > ~/tfprograms/bad_filenames.txt
-process_directory ~/tfprograms/dataset
+echo "" > ~/Desktop/bad_filenames.txt
+process_directory ~/Desktop/food-101

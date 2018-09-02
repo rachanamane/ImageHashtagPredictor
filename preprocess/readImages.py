@@ -11,12 +11,12 @@ FLAGS = tf.app.flags.FLAGS
 def _read_hash_tags(hash_tag_filepath, hashtag_id_lookup):
     hash_tags = []
     with open(hash_tag_filepath, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if line.startswith("#") and ' ' not in line:
-                hashtag = line[1:].lower()
-                if hashtag and hashtag in hashtag_id_lookup:
-                    hash_tags.append(hashtag_id_lookup[hashtag])
+        line = f.readline().strip()
+        current_hashtags = line.split(",")
+        for current_hashtag in current_hashtags:
+            current_hashtag = current_hashtag.lower()
+            if current_hashtag and current_hashtag in hashtag_id_lookup:
+                hash_tags.append(hashtag_id_lookup[current_hashtag])
     return sorted(list(set(hash_tags)))
 
 

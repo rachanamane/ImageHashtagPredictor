@@ -24,12 +24,11 @@ def _get_top_predictions(logits, k):
 def _read_hashtag_file(hash_tag_filepath):
     hash_tags = []
     with open(hash_tag_filepath, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if line.startswith("#") and ' ' not in line:
-                hashtag = line[1:].lower()
-                if hashtag:
-                    hash_tags.append(hashtag)
+        current_hashtags = f.readline().strip().split(",")
+        for current_hashtag in current_hashtags:
+            current_hashtag = current_hashtag.lower()
+            if current_hashtag:
+                hash_tags.append(current_hashtag)
     return sorted(list(set(hash_tags)))
 
 

@@ -9,6 +9,20 @@ from model import readTFRecords, createmodel
 import shared.flags
 FLAGS = tf.app.flags.FLAGS
 
+pet_indices = [0, 1, 11, 15, 16]
+
+only_dog_indices = [3, 9, 25, 27, 31]
+all_dog_indices = only_dog_indices[:]
+all_dog_indices.extend(pet_indices)
+
+only_cat_indices = [13, 17, 18, 22, 24]
+all_cat_indices = only_cat_indices[:]
+all_cat_indices.extend(pet_indices)
+
+generic_food_indices = [2, 5, 10, 26, 28]
+
+all_food_indices = [4, 6, 7, 8, 12, 14, 19, 20, 21, 23, 29, 30]
+all_food_indices.extend(generic_food_indices)
 
 def _get_top_predictions(logits, k=1):
     _, indices = tf.nn.top_k(logits, k)
@@ -59,11 +73,30 @@ def evaluate_model():
                 histogram[predictions_out[i][0]] += 1
                 for k in range(top_k):
                     for j in range(k+1):
+                        curr_prediction = predictions_out[i][j]
                         #print(predictions_out[i][j])
                         #print[a for a in range(299) if encoded_labels_out[i][a] == 1]
                         #print(encoded_labels_out[i][predictions_out[i][j]])
-                        if encoded_labels_out[i][predictions_out[i][j]] == 1:
+                        if encoded_labels_out[i][curr_prediction] == 1:
                             true_positives[k] += 1
+                        elif curr_prediction in only_dog_indices:
+                            # for dog predictions, if actual labels are any of dog/pet labels, mark true
+                            for dog_index in all_dog_indices:
+                                if encoded_labels_out[i][dog_index] == 1:
+                                    true_positives[k] += 1
+                                    break
+                        elif curr_prediction in only_cat_indices:
+                            # for cat predictions, if actual labels are any of cat/pet labels, mark true
+                            for cat_index in all_cat_indices:
+                                if encoded_labels_out[i][cat_index] == 1:
+                                    true_positives[k] += 1
+                                    break
+                        elif curr_prediction in all_food_indices:
+                            # for food predictions, if actual labels are any of generic food labels, mark true
+                            for generic_food_index in generic_food_indices:
+                                if encoded_labels_out[i][generic_food_index] == 1:
+                                    true_positives[k] += 1
+                                    break
                         else:
                             false_positives[k] += 1
                         #print("True: %s, False: %s" % (true_positives, false_positives))
