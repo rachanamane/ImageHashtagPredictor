@@ -43,11 +43,11 @@ def evaluate_model():
 
     image_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, FLAGS.image_width, FLAGS.image_height, 3])
     encoded_labels_placeholder = tf.placeholder(tf.int64, shape=[FLAGS.batch_size, FLAGS.label_set_size])
+    user_history_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, FLAGS.label_set_size])
 
-    logits = createmodel.logits(image_placeholder)
+    logits = createmodel.logits(image_placeholder, user_history_placeholder)
     logits_sig = tf.nn.sigmoid(logits)
     predictions = _get_top_predictions(logits_sig, top_k)
-    #predictions = _get_top_predictions(logits, top_k)
 
     saver = tf.train.Saver()
 
@@ -66,17 +66,18 @@ def evaluate_model():
         saver.restore(sess, tf.train.latest_checkpoint(FLAGS.train_checkpoint_dir))
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord, sess=sess)
-        util.printVars(sess)
+        #util.printVars(sess)
 
         steps = FLAGS.eval_set_size // (FLAGS.batch_size)
         print("Evaluating in %s steps" % steps)
         for eval_step in range(steps):
-            image_out, encoded_labels_out = sess.run([image_raw, encoded_labels])
+            image_out, encoded_labels_out, user_history_out = sess.run([image_raw, encoded_labels, user_history])
 
             _, _, predictions_out = sess.run([logits, logits_sig, predictions],
                                   feed_dict={
                                       image_placeholder: image_out,
-                                      encoded_labels_placeholder: encoded_labels_out})
+                                      encoded_labels_placeholder: encoded_labels_out,
+                                      user_history_placeholder: user_history_out})
 
             #print(predictions_out)
             for i in range(FLAGS.batch_size):
@@ -106,16 +107,19 @@ def evaluate_model():
                         #print("----------------")
 
             if eval_step % 20 == 19:
-                print ("Precision for top 1 labels (ground truth): %s%%" % (ground_true_positives[0] * 100.0 / precision_denominator[0]))
-                print ("Precision for top 1 labels (similar hashtags counted true positive): %s%%" % (similar_positives[0] * 100.0 / precision_denominator[0]))
-
-        for k in range(top_k):
-            print ("Precision for top %s labels (ground truth): %s%%" % (k, ground_true_positives[k] * 100.0 / precision_denominator[k]))
-            print ("Precision for top %s labels (similar hashtags counted true positive): %s%%" % (k, similar_positives[k] * 100.0 / precision_denominator[k]))
+                print ("Precision for top 1 labels (ground truth vs similar_hashtags_truth): %.2f%%  |  %.2f%%" %
+                       ((ground_true_positives[0] * 100.0 / precision_denominator[0]),
+                        (similar_positives[0] * 100.0 / precision_denominator[0])))
 
         print ("Histogram of first prediction:")
         for i in range(FLAGS.label_set_size):
             print("%s: %s" % (i, histogram[i]))
+
+        for k in range(top_k):
+            print ("Precision for top %s labels (ground truth vs similar_hashtags_truth): %.2f%%  |  %.2f%%" %
+                       (k+1,
+                        (ground_true_positives[k] * 100.0 / precision_denominator[k]),
+                        (similar_positives[k] * 100.0 / precision_denominator[k])))
 
         coord.request_stop()
         coord.join(threads)

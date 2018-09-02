@@ -23,8 +23,9 @@ def run_model(predict_image_data, hashtag_name_lookup):
 
     image_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, FLAGS.image_width, FLAGS.image_height, 3])
     encoded_labels_placeholder = tf.placeholder(tf.uint16, shape=[FLAGS.batch_size, FLAGS.label_set_size])
+    user_history_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, FLAGS.label_set_size])
 
-    logits = createmodel.logits(image_placeholder)
+    logits = createmodel.logits(image_placeholder, user_history_placeholder)
     loss = createmodel.loss(logits, encoded_labels_placeholder)
 
     train_step = tf.train.GradientDescentOptimizer(0.0005).minimize(loss)
@@ -45,13 +46,14 @@ def run_model(predict_image_data, hashtag_name_lookup):
         steps = (FLAGS.training_set_size * FLAGS.num_epochs // FLAGS.batch_size)
         print("Running %s steps" % steps)
         for i in range(steps):
-            image_out, encoded_labels_out = sess.run([image_raw, encoded_labels])
+            image_out, encoded_labels_out, user_history_out = sess.run([image_raw, encoded_labels, user_history])
 
             _, logits_out, loss_out = sess.run(
                 [train_step, logits, loss],
                 feed_dict={
                     image_placeholder: image_out,
-                    encoded_labels_placeholder: encoded_labels_out})
+                    encoded_labels_placeholder: encoded_labels_out,
+                    user_history_placeholder: user_history_out})
 
             print("Completed %s of %s steps. Loss: %s" % (i, steps, loss_out))
             if i % 20 == 19:

@@ -7,7 +7,8 @@ FLAGS = tf.app.flags.FLAGS
 pool_size = 2
 padding = "same"
 
-def logits(image, print_debug=True):
+
+def logits(image, user_history, print_debug=True):
     current_tensor_width = FLAGS.image_width
     current_tensor_height = FLAGS.image_height
     if print_debug:
@@ -107,12 +108,19 @@ def logits(image, print_debug=True):
     pool_flat = tf.layers.flatten(pool3, name="my_Pool_layer_flat")
     if print_debug:
         print("pool_flat %s" % pool_flat.shape)
+        print("user_history %s" % user_history.shape)
+
+    weighted_user_history = tf.multiply(tf.constant(1, shape=user_history.shape), user_history)
+
+    pool_flat_with_history = tf.concat([pool_flat, weighted_user_history], axis=1, name="my_user_history_concat_layer")
+    if print_debug:
+        print("pool_flat_with_history %s" % pool_flat_with_history.shape)
 
     # Dense Layer
     # Densely connected layer with 1024 neurons
     # Input Tensor Shape: [batch_size, 74 * 74 * 64]
     # Output Tensor Shape: [batch_size, 1024]
-    dense1 = tf.layers.dense(inputs=pool_flat, units=1024, activation=tf.nn.relu, name="my_Dense_layer_1")
+    dense1 = tf.layers.dense(inputs=pool_flat_with_history, units=1024, activation=tf.nn.relu, name="my_Dense_layer_1")
     if print_debug:
         print("dense1 %s" % dense1.shape)
 
