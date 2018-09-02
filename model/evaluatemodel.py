@@ -110,8 +110,8 @@ def evaluate_model():
                 print ("Precision for top 1 labels (similar hashtags counted true positive): %s%%" % (similar_positives[0] * 100.0 / precision_denominator[0]))
 
         for k in range(top_k):
-            print ("Precision for top 1 labels (ground truth): %s%%" % (ground_true_positives[k] * 100.0 / precision_denominator[k]))
-            print ("Precision for top 1 labels (similar hashtags counted true positive): %s%%" % (similar_positives[k] * 100.0 / precision_denominator[k]))
+            print ("Precision for top %s labels (ground truth): %s%%" % (k, ground_true_positives[k] * 100.0 / precision_denominator[k]))
+            print ("Precision for top %s labels (similar hashtags counted true positive): %s%%" % (k, similar_positives[k] * 100.0 / precision_denominator[k]))
 
         print ("Histogram of first prediction:")
         for i in range(FLAGS.label_set_size):
