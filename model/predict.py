@@ -3,7 +3,7 @@ import tensorflow as tf
 import preprocess.createHashtagsFile as createHashtagsFile
 
 from model import createmodel
-from os.path import isfile
+from os.path import isfile, join
 
 # Unused import - Required for flags - Don't remove
 import shared.flags
@@ -65,7 +65,7 @@ def predict_model(image_data, hashtag_name_lookup, real_hashtags):
     saver = tf.train.Saver()
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        saver.restore(sess, tf.train.latest_checkpoint(FLAGS.train_checkpoint_dir))
+        saver.restore(sess, join(FLAGS.train_checkpoint_dir, FLAGS.checkpoint_file))
 
         image_cropped_out = sess.run(image_cropped, feed_dict={image_data_placeholder: image_data})
         _ = sess.run(image_reshaped, feed_dict={image_placeholder: image_cropped_out})

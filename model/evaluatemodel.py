@@ -3,7 +3,7 @@ import tensorflow as tf
 
 import model.util as util
 from model import readTFRecords, createmodel
-
+from os.path import join
 
 # Unused import - Required for flags - Don't remove
 import shared.flags
@@ -63,7 +63,7 @@ def evaluate_model():
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        saver.restore(sess, tf.train.latest_checkpoint(FLAGS.train_checkpoint_dir))
+        saver.restore(sess, join(FLAGS.train_checkpoint_dir, FLAGS.checkpoint_file))
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord, sess=sess)
         #util.printVars(sess)
