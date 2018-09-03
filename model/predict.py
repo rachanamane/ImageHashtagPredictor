@@ -10,7 +10,7 @@ import shared.flags
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('image_path', '/Users/namitr/tfprograms/dataset/Dog/4.jpg',
+flags.DEFINE_string('image_path', '/home/vaibhav/tfprograms/dataset/spaghetti_carbonara/42554.jpg',
 					'Path of image to predict labels.')
 flags.DEFINE_integer('predictions_count', 10,
 					'Number of predictions.')

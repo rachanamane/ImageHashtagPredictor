@@ -7,7 +7,7 @@ flags = tf.app.flags
 FLAGS = flags.FLAGS
 
 def main():
-    with tf.gfile.FastGFile('/Users/namitr/tfprograms/dataset/dogsofinstagram/1502391_2018-08-08_22-35-18_3.jpg', 'rb') as f:
+    with tf.gfile.FastGFile('/home/vaibhav/tfprograms/dataset/dogsofinstagram/1502391_2018-08-08_22-35-18_3.jpg', 'rb') as f:
         image_data = f.read()
 
     tf.reset_default_graph()
@@ -23,7 +23,7 @@ def main():
             sess.run(tf.global_variables_initializer())
 
             image_encoded_out = sess.run(image_encoded, feed_dict={image_data_placeholder: image_data})
-            with tf.gfile.FastGFile('/Users/namitr/tfprograms/new.jpg', 'w') as f:
+            with tf.gfile.FastGFile('/home/vaibhav/tfprograms/new.jpg', 'w') as f:
                 f.write(image_encoded_out)
 
             sess.close()
