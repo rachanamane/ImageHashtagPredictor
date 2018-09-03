@@ -52,6 +52,8 @@ def _create_empty_user_history():
     return user_history
 
 
+
+
 def read_all_directories(root_path):
     image_and_tags = []
     user_history = _create_empty_user_history()

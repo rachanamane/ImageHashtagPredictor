@@ -21,6 +21,9 @@ flags.DEFINE_string('tensorboard_logs_dir', '/home/vaibhav/tfprograms/generated/
 flags.DEFINE_string('hashtags_output_file', '/home/vaibhav/tfprograms/generated/hashtag_map.txt',
 					'Hashtags used for training.')
 
+flags.DEFINE_string('user_history_output_file', '/home/vaibhav/tfprograms/generated/user_history.txt',
+					'User hashtag usage history.')
+
 flags.DEFINE_integer('num_epochs', 3, 'Number of epochs')
 
 flags.DEFINE_integer('training_set_size', 42000, 'Training set size.')

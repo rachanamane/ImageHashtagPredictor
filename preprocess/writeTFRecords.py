@@ -125,8 +125,15 @@ def _process_dataset(mode, image_and_hashtags, num_shards, user_history):
     print("Images by foldername: %s - %s" % (mode, dict))
 
 
+def _write_user_history(user_history):
+    with open(FLAGS.user_history_output_file, 'w') as f:
+        for i in range(10):
+            f.write("%s\n" % " ".join([str(x) for x in user_history[i]]))
+
+
 def main():
     image_and_hashtags, user_history = readImages.read_all_directories(FLAGS.dataset_dir)
+    _write_user_history(user_history)
     random.shuffle(image_and_hashtags)
     if FLAGS.training_set_size + FLAGS.eval_set_size > len(image_and_hashtags):
         raise Exception("Please reduce training or evaluation size. Total images available are %s" % (len(image_and_hashtags)))
