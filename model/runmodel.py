@@ -5,8 +5,6 @@ import model.readTFRecords as readTFRecords
 import model.createmodel as createmodel
 import model.util as util
 
-import preprocess.createHashtagsFile as createHashtagsFile
-
 from os.path import join
 
 # Unused import - Required for flags - Don't remove
@@ -18,7 +16,7 @@ def _get_top_predictions(logits, k):
     return indices
 
 
-def run_model(predict_image_data, hashtag_name_lookup):
+def run_model():
     image_raw, _, encoded_labels, user_history = readTFRecords.read_tf_records("train", is_training=True)
 
     image_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, FLAGS.image_width, FLAGS.image_height, 3])
@@ -74,17 +72,12 @@ def run_model(predict_image_data, hashtag_name_lookup):
 
 
 def main():
-    hashtag_id_lookup = createHashtagsFile.get_hashtag_label_set()
-    hashtag_name_lookup = {v: k for k, v in hashtag_id_lookup.iteritems()}
-    with tf.gfile.FastGFile('/Users/namitr/tfprograms/6256005716_2018-08-08_23-22-22.jpg', 'rb') as f:
-        predict_image_data = f.read()
-
     # TODO: Consider using Estimator:
     # https://www.tensorflow.org/api_docs/python/tf/estimator/Estimator#predict
     tf.reset_default_graph()
     with tf.Graph().as_default():
         tf.logging.set_verbosity(tf.logging.INFO)
-        run_model(predict_image_data, hashtag_name_lookup)
+        run_model()
 
 
 if __name__ == "__main__":
