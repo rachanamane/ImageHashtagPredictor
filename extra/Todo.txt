@@ -1,0 +1,8 @@
+1. Add 3x3 confusion matrix
+2. Calculate precision and recall for evaluation examples
+3. Add trending hashtag functionality (Either of the below)
+    a. Add n trending hashtags to all the images stating required assumptions
+    b. Add different trending hashtag to different images which simulates the real world scenario
+4. Write a prediction model after incorporating trending hashtags functionality.
+5. Prepare a PPT for the demonstration
+
