@@ -76,7 +76,8 @@ def predict_model(image_data, hashtag_name_lookup, real_hashtags, user_history):
     saver = tf.train.Saver()
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        saver.restore(sess, join(FLAGS.train_checkpoint_dir, FLAGS.checkpoint_file))
+        checkpoint_file = "%s-%s.ckpt" % (FLAGS.checkpoint_file, FLAGS.num_epochs)
+        saver.restore(sess, join(FLAGS.train_checkpoint_dir, checkpoint_file))
 
         image_cropped_out = sess.run(image_cropped, feed_dict={image_data_placeholder: image_data})
         _ = sess.run(image_reshaped, feed_dict={image_placeholder: image_cropped_out})

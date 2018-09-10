@@ -7,6 +7,8 @@ FLAGS = tf.app.flags.FLAGS
 default_pool_size = 2
 default_padding = "same"
 
+#fake_trending_hashtags = [[2, 5, 10, 11, 27]] * FLAGS.batch_size
+
 
 def logits(image, user_history, print_debug=True):
     if print_debug:
@@ -92,13 +94,19 @@ def logits(image, user_history, print_debug=True):
 
     # [-1, current_tensor_width * current_tensor_height * current_filters],
     pool_flat = tf.layers.flatten(pool3, name="my_Pool_layer_flat")
+    weighted_user_history = tf.multiply(tf.constant(1.0, shape=user_history.shape), user_history)
+    #fake_trending_tensor = tf.cast(tf.convert_to_tensor(fake_trending_hashtags), tf.float32)
     if print_debug:
         print("pool_flat %s" % pool_flat.shape)
         print("user_history %s" % user_history.shape)
+        #print("fake_trending_tensor %s" % fake_trending_tensor.shape)
 
-    weighted_user_history = tf.multiply(tf.constant(1.0, shape=user_history.shape), user_history)
-
-    pool_flat_with_history = tf.concat([pool_flat, weighted_user_history], axis=1, name="my_user_history_concat_layer")
+    pool_flat_with_history = tf.concat(
+            [
+                pool_flat,
+                weighted_user_history,
+                #fake_trending_tensor,
+            ], axis=1, name="my_user_history_concat_layer")
     if print_debug:
         print("pool_flat_with_history %s" % pool_flat_with_history.shape)
 

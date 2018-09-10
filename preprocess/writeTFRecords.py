@@ -135,10 +135,12 @@ def main():
     image_and_hashtags, user_history = readImages.read_all_directories(FLAGS.dataset_dir)
     _write_user_history(user_history)
     random.shuffle(image_and_hashtags)
-    if FLAGS.training_set_size + FLAGS.eval_set_size > len(image_and_hashtags):
+    training_set_size = FLAGS.train_write_shards * FLAGS.images_per_shard
+    eval_set_size = FLAGS.eval_write_shards * FLAGS.images_per_shard
+    if training_set_size + eval_set_size > len(image_and_hashtags):
         raise Exception("Please reduce training or evaluation size. Total images available are %s" % (len(image_and_hashtags)))
-    train_image_and_hashtags = [image_and_hashtags[i] for i in range(0, FLAGS.training_set_size)]
-    eval_image_and_hashtags = [image_and_hashtags[i] for i in range(FLAGS.training_set_size, FLAGS.training_set_size + FLAGS.eval_set_size)]
+    train_image_and_hashtags = [image_and_hashtags[i] for i in range(0, training_set_size)]
+    eval_image_and_hashtags = [image_and_hashtags[i] for i in range(training_set_size, training_set_size + eval_set_size)]
 
     tf.reset_default_graph()
     with tf.Graph().as_default():

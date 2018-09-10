@@ -28,7 +28,7 @@ def run_model():
 
     train_step = tf.train.AdamOptimizer(0.0005).minimize(loss)
 
-    saver = tf.train.Saver()
+    saver = tf.train.Saver(max_to_keep=FLAGS.num_epochs)
 
     start_time = time.time()
     prev_time = start_time
@@ -41,7 +41,8 @@ def run_model():
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord, sess=sess)
 
-        steps = (FLAGS.training_set_size * FLAGS.num_epochs // FLAGS.batch_size)
+        total_train_images = FLAGS.images_per_shard * FLAGS.model_train_shards
+        steps = (total_train_images * FLAGS.num_epochs // FLAGS.batch_size)
         print("Running %s steps" % steps)
         for i in range(steps):
             image_out, encoded_labels_out, user_history_out = sess.run([image_raw, encoded_labels, user_history])
@@ -55,7 +56,10 @@ def run_model():
 
             print("Completed %s of %s steps. Loss: %s" % (i, steps, loss_out))
             if i % 20 == 19:
-                saver.save(sess, join(FLAGS.train_checkpoint_dir, FLAGS.checkpoint_file))
+                steps_per_epoch = total_train_images // FLAGS.batch_size
+                cur_epoch = (i // steps_per_epoch) + 1
+                checkpoint_file = "%s-%s.ckpt" % (FLAGS.checkpoint_file, cur_epoch)
+                saver.save(sess, join(FLAGS.train_checkpoint_dir, checkpoint_file))
                 #util.printVars(sess)
                 cur_time = time.time()
                 duration = cur_time - start_time

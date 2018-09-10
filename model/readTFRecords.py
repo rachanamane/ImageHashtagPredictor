@@ -26,9 +26,15 @@ def read_image_from_tfrecord(filename_queue):
     })
     return SingleImageObject(features_dict)
 
+
 def get_tfrecord_filenames(mode):
     files = listdir(FLAGS.tfrecords_dir)
-    return [os.path.join(FLAGS.tfrecords_dir, x) for x in files if x.endswith(".tfrecord") and x.startswith(mode)]
+    tfrecords_files = [os.path.join(FLAGS.tfrecords_dir, x) for x in files if x.endswith(".tfrecord") and x.startswith(mode)]
+    tfrecords_files.sort()
+    num_shards = FLAGS.model_train_shards if mode == "train" else FLAGS.model_eval_shards
+    if num_shards > len(tfrecords_files):
+        raise Exception("Not enough TFRecords. Available: %s. Requested %s" % (len(tfrecords_files), num_shards))
+    return tfrecords_files[:num_shards]
 
 
 def read_tf_records(mode, is_training):
