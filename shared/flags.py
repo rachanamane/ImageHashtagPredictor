@@ -40,6 +40,3 @@ flags.DEFINE_integer('eval_write_shards', 14, 'Number of shards for creating TF 
 
 flags.DEFINE_integer('model_train_shards', 10, 'Number of shards for training data')
 flags.DEFINE_integer('model_eval_shards', 4, 'Number of shards for training data')
-
-flags.DEFINE_boolean('use_insta_posts_with_multiple_images', False,
-					 'Use posts that have multiple images in a single post')
