@@ -23,7 +23,7 @@ def run_model():
     encoded_labels_placeholder = tf.placeholder(tf.uint16, shape=[FLAGS.batch_size, FLAGS.label_set_size])
     user_history_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, FLAGS.label_set_size])
 
-    logits = createmodel.parallel_conv2d_logits(image_placeholder, user_history_placeholder)
+    logits = createmodel.logits(image_placeholder, user_history_placeholder)
     loss = createmodel.loss(logits, encoded_labels_placeholder)
 
     train_step = tf.train.AdamOptimizer(0.0005).minimize(loss)

@@ -67,7 +67,6 @@ def predict_model(image_data, hashtag_name_lookup, real_hashtags, user_history):
     image_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.image_width, FLAGS.image_height, 3])
     image_reshaped = tf.reshape(image_placeholder, [1, FLAGS.image_width, FLAGS.image_height, 3])
 
-    # TODO: Fix this
     user_history_tensor = tf.reshape(tf.cast(tf.convert_to_tensor(user_history), tf.float32), [1, FLAGS.label_set_size])
 
     logits = createmodel.logits(image_reshaped, user_history_tensor, print_debug=False)

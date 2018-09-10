@@ -45,7 +45,7 @@ def evaluate_model():
     encoded_labels_placeholder = tf.placeholder(tf.int64, shape=[FLAGS.batch_size, FLAGS.label_set_size])
     user_history_placeholder = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, FLAGS.label_set_size])
 
-    logits = createmodel.parallel_conv2d_logits(image_placeholder, user_history_placeholder)
+    logits = createmodel.logits(image_placeholder, user_history_placeholder)
     logits_sig = tf.nn.sigmoid(logits)
     predictions = _get_top_predictions(logits_sig, top_k)
 
