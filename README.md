@@ -20,7 +20,7 @@ python model/evaluatemodel.py
 python model/predict.py --image_path=<insert_image_path_here>
 ```
 
-
+```
 The hashtag labels are following
      0 petstagram
      1 cute
@@ -54,3 +54,4 @@ The hashtag labels are following
     29 cake
     30 pizza
     31 puppylove
+    ```
