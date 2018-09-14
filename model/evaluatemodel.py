@@ -153,5 +153,8 @@ def main(cur_epoch):
 
 
 if __name__ == "__main__":
-    for i in range(FLAGS.num_epochs):
-        main(i+1)
+    if FLAGS.eval_checkpoint_epoch == -1:
+        for i in range(FLAGS.num_epochs):
+            main(i+1)
+    else:
+        main(FLAGS.eval_checkpoint_epoch)

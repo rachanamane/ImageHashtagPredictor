@@ -12,7 +12,7 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string('image_path', '/home/vaibhav/tfprograms/dataset/spaghetti_carbonara/42554.jpg',
 					'Path of image to predict labels.')
-flags.DEFINE_integer('predictions_count', 10,
+flags.DEFINE_integer('predictions_count', 3,
 					'Number of predictions.')
 
 
@@ -76,7 +76,8 @@ def predict_model(image_data, hashtag_name_lookup, real_hashtags, user_history):
     saver = tf.train.Saver()
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        checkpoint_file = "%s-%s.ckpt" % (FLAGS.checkpoint_file, FLAGS.num_epochs)
+        checkpoint_epoch = FLAGS.eval_checkpoint_epoch if FLAGS.eval_checkpoint_epoch != -1 else FLAGS.num_epochs
+        checkpoint_file = "%s-%s.ckpt" % (FLAGS.checkpoint_file, checkpoint_epoch)
         saver.restore(sess, join(FLAGS.train_checkpoint_dir, checkpoint_file))
 
         image_cropped_out = sess.run(image_cropped, feed_dict={image_data_placeholder: image_data})
@@ -85,7 +86,7 @@ def predict_model(image_data, hashtag_name_lookup, real_hashtags, user_history):
         _, logits_sig_out, predictions_out = sess.run([logits, logits_sig, predictions],
                               feed_dict={image_placeholder: image_cropped_out})
 
-        print("\n---------------   Results ---------------------\n")
+        print("\n---------------   Results start ---------------------\n")
         print("Real hashtags with image:\n %s\n" % real_hashtags)
         print("%20s  Prob  isCorrect" % "Prediction")
         for i in range(FLAGS.predictions_count):
@@ -93,6 +94,7 @@ def predict_model(image_data, hashtag_name_lookup, real_hashtags, user_history):
                   (hashtag_name_lookup[predictions_out[0][i]],
                    logits_sig_out[0][predictions_out[0][i]],
                    hashtag_name_lookup[predictions_out[0][i]] in real_hashtags))
+        print("\n---------------   Results over ---------------------\n")
 
         sess.close()
 
