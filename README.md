@@ -1,7 +1,7 @@
-#Instagram Hashtag Predictor
-The raw dataset used is large in size. If you need to train the model from with the dataset, please email me. 
+# Instagram Hashtag Predictor
+The raw dataset used is large in size. If you need to train the model from with the dataset, please to rachanamane93@gmail.com 
 
-##Tech
+## Tech
 [Tensorflow](https://www.tensorflow.org/): Install tensorflow [here] (https://www.tensorflow.org/install/) 
 
 Need to run the following before executing any scripts:
