@@ -1,11 +1,27 @@
-# ImageHashtagPredictor
+# Instagram Hashtag Predictor
+The raw dataset used is large in size. If you need to train the model from with the dataset, please to rachanamane93@gmail.com 
+
+## Tech
+[Tensorflow](https://www.tensorflow.org/): Install tensorflow [here] (https://www.tensorflow.org/install/) 
 
 Need to run the following before executing any scripts:
-
 ```
 export PYTHONPATH=/home/<path-to-root>/ImageHashtagPredictor/
 ```
+Change the Shared -> Flags file suitably. All the paths and parameter inputs are in the flags file. 
+Execute these commands:
+```
+git clone https://github.com/rachanamane/ImageHashtagPredictor.git
+cd ImageHashtagPredictor
+python preprocess/createHashtagFile.py
+python preprocess/writeTFRecords.py
+python model/runmodel.py (In case you are training the model and not using the pre-trained checkpoints)
+python model/evaluatemodel.py
+python model/predict.py --image_path=<insert_image_path_here>
+```
 
+```
+The hashtag labels are following
      0 petstagram
      1 cute
      2 foodie
@@ -38,3 +54,4 @@ export PYTHONPATH=/home/<path-to-root>/ImageHashtagPredictor/
     29 cake
     30 pizza
     31 puppylove
+    ```
