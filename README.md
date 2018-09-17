@@ -10,13 +10,13 @@ export PYTHONPATH=/home/<path-to-root>/ImageHashtagPredictor/
 ```
 
 Download the following folder which contains:
-A. generated
-    1. Checkpoints
+1. generated
+    - Checkpoints
         The checkpoints correspond to model trained on 42000 images run with 3 epochs.
-    2. TF Records
+    - TF Records
         Tensorflow records for evaluation dataset (7000 images)
-    3. Compiled list of all the hashtag labels
-    4. User hitory output file
+    - Compiled list of all the hashtag labels
+    - User hitory output file
 B. prediction
     Prediction dataset
 
@@ -36,9 +36,6 @@ Execute these commands:
 ```
 git clone https://github.com/rachanamane/ImageHashtagPredictor.git
 cd ImageHashtagPredictor
-python preprocess/createHashtagFile.py
-python preprocess/writeTFRecords.py
-python model/runmodel.py 
 python model/evaluatemodel.py
 python model/predict.py --image_path=<insert_image_path_here>
 ```
