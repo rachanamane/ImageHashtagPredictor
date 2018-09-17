@@ -1,14 +1,28 @@
 # Instagram Hashtag Predictor
-The raw dataset used is large in size. If you need to train the model from with the dataset, please to rachanamane93@gmail.com 
+Nowadays, users upload and share images on social networks with hashtags (especially on
+Instagram). There are a many really good machine learning models available (e.g. inception
+model published by Google) for image recognition based on the pixels in the image. Hashtags
+used by real users on Instagram are much more varied and nuanced at describing the image
+being shared on Instagram. For example, an image of spaghetti could be shared with the
+hashtags #italiandinner or #yummy. There are various factors apart from the pixels in the
+image that can be leveraged to predict the hashtags that an user can use when uploading
+an image. This project aims at leveraging that information, more specifically leveraging the
+history of hashtags used by the user and globally trending hashtags in addition to the pixels
+in the image to train a neural network for hashtag prediction.
 
-## Tech
+## Prerequisites
+
+Python v2.7: Install [here](https://www.python.org/downloads/release/python-2715/)
+
 [Tensorflow](https://www.tensorflow.org/): Install tensorflow [here] (https://www.tensorflow.org/install/) 
+
 
 Need to run the following before executing any scripts:
 ```
 export PYTHONPATH=/home/<path-to-root>/ImageHashtagPredictor/
 ```
 
+## Pre-trained model with sample prediction images
 Download the following folder which contains:
 1. generated
     - Checkpoints
@@ -40,7 +54,8 @@ python model/evaluatemodel.py
 python model/predict.py --image_path=<insert_image_path_here>
 ```
 
-
+## Author
+Rachana Mane @rachanamane   
 ```
 The hashtag labels are following
      0 petstagram
