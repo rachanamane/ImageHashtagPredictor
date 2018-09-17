@@ -14,7 +14,7 @@ in the image to train a neural network for hashtag prediction.
 
 1. Python v2.7: Install [here](https://www.python.org/downloads/release/python-2715/)
 
-2. [Tensorflow](https://www.tensorflow.org/): Install tensorflow [here] (https://www.tensorflow.org/install/) 
+2. [Tensorflow](https://www.tensorflow.org/): Install tensorflow [here](https://www.tensorflow.org/install/) 
 
 3. Need to run the following before executing any scripts:
 ```
