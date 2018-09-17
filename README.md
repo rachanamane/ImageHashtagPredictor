@@ -30,9 +30,9 @@ Modify file Shared -> Flags
 3. user_history_output_file : '/home/<path-to-root>/tfprograms/generated/user_history.txt'
 3. model_eval_shards : If you want to evaluate the full eval dataset, set the number of shards to 14. 
    One shard has 500 images.
-```
-Change the Shared -> Flags file suitably. All the paths and parameter inputs are in the flags file. 
-Execute these commands:
+   
+### Evaluate pre-trained model 
+
 ```
 git clone https://github.com/rachanamane/ImageHashtagPredictor.git
 cd ImageHashtagPredictor
@@ -40,7 +40,6 @@ python model/evaluatemodel.py
 python model/predict.py --image_path=<insert_image_path_here>
 ```
 
-Following are the commands to train the model
 
 ```
 The hashtag labels are following
