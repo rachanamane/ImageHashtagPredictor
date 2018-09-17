@@ -12,12 +12,11 @@ in the image to train a neural network for hashtag prediction.
 
 ## Prerequisites
 
-Python v2.7: Install [here](https://www.python.org/downloads/release/python-2715/)
+1. Python v2.7: Install [here](https://www.python.org/downloads/release/python-2715/)
 
-[Tensorflow](https://www.tensorflow.org/): Install tensorflow [here] (https://www.tensorflow.org/install/) 
+2. [Tensorflow](https://www.tensorflow.org/): Install tensorflow [here] (https://www.tensorflow.org/install/) 
 
-
-Need to run the following before executing any scripts:
+3. Need to run the following before executing any scripts:
 ```
 export PYTHONPATH=/home/<path-to-root>/ImageHashtagPredictor/
 ```
@@ -55,7 +54,9 @@ python model/predict.py --image_path=<insert_image_path_here>
 ```
 
 ## Author
-Rachana Mane @rachanamane   
+* Rachana Mane   
+
+## Labels set for the model
 ```
 The hashtag labels are following
      0 petstagram
