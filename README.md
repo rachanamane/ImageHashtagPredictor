@@ -21,10 +21,10 @@ Download the following folder which contains:
     Prediction dataset
 
 ```
-https://drive.google.com/drive/folders/1rDS3h-42-6I1LIFfkkfrWa0CSQj5djS_?usp=sharing
+https://drive.google.com/drive/folders/16xRHMzoStlXET9Sptm4zKQpjI-EV0fP2?usp=sharing
 ```
 
-Modify file Shared -> Flags 
+### Modify file Shared -> Flags 
 1. tfrecords_dir : '/home/<path-to-root>/tfprograms/generated/tfrecords'
 2. train_checkpoint_dir : '/home/<path-to-root>/tfprograms/generated/checkpoints'
 3. user_history_output_file : '/home/<path-to-root>/tfprograms/generated/user_history.txt'
