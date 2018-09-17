@@ -39,7 +39,7 @@ flags.DEFINE_integer('train_write_shards', 84, 'Number of shards for creating TF
 flags.DEFINE_integer('eval_write_shards', 14, 'Number of shards for creating TF Records for evaluation')
 
 flags.DEFINE_integer('model_train_shards', 84, 'Number of shards for training data')
-flags.DEFINE_integer('model_eval_shards', 2, 'Number of shards for training data')
+flags.DEFINE_integer('model_eval_shards', 2, 'Number of shards for evaluation data')
 
 flags.DEFINE_integer('eval_checkpoint_epoch', 3,
 					 'If -1, run evaluation against all epochs. Otherwise, run evaluation against the provided epoch')
