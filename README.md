@@ -17,7 +17,7 @@ Download the following folder which contains:
         Tensorflow records for evaluation dataset (7000 images)
     - Compiled list of all the hashtag labels
     - User hitory output file
-B. prediction
+2. prediction
     Prediction dataset
 
 ```
