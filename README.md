@@ -30,8 +30,7 @@ Download the following folder which contains:
         Tensorflow records for evaluation dataset (7000 images)
     - Compiled list of all the hashtag labels
     - User hitory output file
-2. prediction
-    Prediction dataset
+2. prediction (Sample images to predict hashtags)
 
 ```
 https://drive.google.com/drive/folders/16xRHMzoStlXET9Sptm4zKQpjI-EV0fP2?usp=sharing
@@ -47,8 +46,6 @@ https://drive.google.com/drive/folders/16xRHMzoStlXET9Sptm4zKQpjI-EV0fP2?usp=sha
 ### Evaluate pre-trained model 
 
 ```
-git clone https://github.com/rachanamane/ImageHashtagPredictor.git
-cd ImageHashtagPredictor
 python model/evaluatemodel.py
 python model/predict.py --image_path=<insert_image_path_here>
 ```
@@ -91,4 +88,5 @@ The hashtag labels are following
     29 cake
     30 pizza
     31 puppylove
-    ```
+    
+```
