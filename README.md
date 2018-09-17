@@ -29,14 +29,16 @@ Download the following folder which contains:
     - TF Records
         Tensorflow records for evaluation dataset (7000 images)
     - Compiled list of all the hashtag labels
-    - User hitory output file
+    - User history output file
 2. prediction (Sample images to predict hashtags)
 
 ```
-https://drive.google.com/drive/folders/16xRHMzoStlXET9Sptm4zKQpjI-EV0fP2?usp=sharing
+https://drive.google.com/drive/folders/16xRHMzoStlXET9Sptm4zKQpjI-EV0fP2
 ```
 
-### Modify file Shared -> Flags 
+### Modify flags
+Modify the following flags in shared/flags.py
+ 
 1. tfrecords_dir : '/home/<path-to-root>/tfprograms/generated/tfrecords'
 2. train_checkpoint_dir : '/home/<path-to-root>/tfprograms/generated/checkpoints'
 3. user_history_output_file : '/home/<path-to-root>/tfprograms/generated/user_history.txt'
